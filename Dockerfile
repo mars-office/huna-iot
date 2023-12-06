@@ -4,9 +4,9 @@ RUN pip install --upgrade platformio
 COPY ./platformio.ini ./platformio.ini
 RUN pio lib install
 COPY . .
-RUN pio run
 ARG DEPLOYABLE_VERSION
-RUN echo "${DEPLOYABLE_VERSION}" > ./.pio/build/esp32doit-devkit-v1/VERSION.txt
+RUN echo '#define VERSION "${DEPLOYABLE_VERSION}"' > ./src/version.h
+RUN pio run
 
 FROM alpine:latest AS runner
 WORKDIR /app
