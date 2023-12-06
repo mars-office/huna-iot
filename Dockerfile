@@ -10,7 +10,7 @@ RUN echo "${DEPLOYABLE_VERSION}" > ./.pio/build/esp32doit-devkit-v1/VERSION.txt
 
 FROM alpine:latest AS runner
 WORKDIR /app
-COPY --from=builder /app/.pio /app/.pio
+COPY --from=builder /app/.pio /app/
 WORKDIR /
 RUN mkdir -p /firmware
 CMD "rm -rf /firmware/* && cp -R /app/.pio/build/esp32doit-devkit-v1/* /firmware"
