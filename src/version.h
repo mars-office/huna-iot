@@ -1,1 +1,1 @@
-#define VERSION "local"
+#define VERSION "0.0.0"
