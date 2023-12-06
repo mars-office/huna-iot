@@ -1,7 +1,5 @@
-replicaCount: 1
-
 image:
-  repository: ghcr.io/mars-office/template-deployable
+  repository: ghcr.io/mars-office/huna-iot
   pullPolicy: IfNotPresent
   tag: ""
 
@@ -29,22 +27,6 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-service:
-  type: ClusterIP
-  containerPort: 3000
-  exposedPort: 80
-
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-  hosts:
-    - host: template-deployable.local.marsconceptor.com
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -57,12 +39,6 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
 
