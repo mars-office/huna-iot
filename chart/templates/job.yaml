@@ -1,10 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "huna-iot.fullname" . }}-{{ randAlphaNum 5 | lower }}
+  name: {{ include "huna-iot.fullname" . }}-{{ .Chart.AppVersion }}
   labels:
     {{- include "huna-iot.labels" . | nindent 4 }}
 spec:
+  backoffLimit: 0
   template:
     metadata:
       {{- with .Values.podAnnotations }}
