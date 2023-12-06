@@ -37,7 +37,7 @@ spec:
           command:
             - "/bin/sh"
             - "-c"
-            - "rm -rf /firmware/* && cp -R /app/build/esp32doit-devkit-v1 /firmware"
+            - "rm -rf /firmware/* && cp -R /app/build/esp32doit-devkit-v1/* /firmware"
           envFrom:
             {{- toYaml .Values.envFrom | nindent 12 }}
           env:
