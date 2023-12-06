@@ -8,11 +8,10 @@ RUN pio run
 ARG DEPLOYABLE_VERSION
 RUN echo "${DEPLOYABLE_VERSION}" > ./.pio/build/esp32doit-devkit-v1/VERSION.txt
 
-FROM debian:latest AS runner
+FROM alpine:latest AS runner
 WORKDIR /app
 COPY --from=builder /app/.pio /app
 WORKDIR /
 RUN mkdir -p /firmware
-CMD "sleep infinity"
 
 LABEL org.opencontainers.image.source=https://github.com/mars-office/huna-iot
