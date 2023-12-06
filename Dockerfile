@@ -1,8 +1,10 @@
 FROM python:latest AS builder
 WORKDIR /app
 RUN pip install --upgrade platformio
+COPY ./platformio.ini ./platformio.ini
+RUN pio lib install
 COPY . .
-RUN pio lib install && pio run
+RUN pio run
 
 FROM alpine:latest AS runner
 WORKDIR /app
