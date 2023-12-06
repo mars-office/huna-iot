@@ -10,9 +10,9 @@ RUN echo "${DEPLOYABLE_VERSION}" > ./.pio/build/esp32doit-devkit-v1/VERSION.txt
 
 FROM alpine:latest AS runner
 WORKDIR /app
-COPY --from=builder /app/.pio /app/
+COPY --from=builder /app/.pio /app
 WORKDIR /
 RUN mkdir -p /firmware
-CMD "rm -rf /firmware/* && cp -R /app/.pio/build/esp32doit-devkit-v1/* /firmware"
+CMD "rm -rf /firmware/* && cp -R /app/build/esp32doit-devkit-v1/* /firmware"
 
 LABEL org.opencontainers.image.source=https://github.com/mars-office/huna-iot
