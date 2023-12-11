@@ -8,7 +8,7 @@ Config config;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   Serial.print("Version:");
   Serial.println(VERSION);
