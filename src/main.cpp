@@ -10,10 +10,17 @@ void setup()
 {
   Serial.begin(9600);
 
+  Serial.print("Version:");
   Serial.println(VERSION);
-  Serial.println("Setup started");
 
+  Serial.println("Setup started");
+  Serial.println("Reading config...");
   config.init();
+  
+  Serial.print("ID:");
+  Serial.println(config.getId());
+  Serial.print("Server URL:");
+  Serial.println(config.getServerUrl());
 
   pinMode(LED, OUTPUT);
 }

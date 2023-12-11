@@ -20,5 +20,6 @@ const char* FileManager::readFile(const char *fileName)
   File file = SPIFFS.open(fileName, "r");
   String stringValue = file.readString();
   file.close();
-  return stringValue.c_str();
+  const char* dup = strdup(stringValue.c_str());
+  return dup;
 }
