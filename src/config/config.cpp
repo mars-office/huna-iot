@@ -25,7 +25,7 @@ void Config::init()
   const char* config = fileManager->readFile("/config.json");
   delete fileManager;
 
-  StaticJsonDocument<128> doc;
+  StaticJsonDocument<512> doc;
   DeserializationError error = deserializeJson(doc, config);
   const char* id = doc["id"];
   const char* otaServerUrl = doc["otaServerUrl"];
