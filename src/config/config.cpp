@@ -34,7 +34,7 @@ void Config::init()
   delete fileManager;
 
   StaticJsonDocument<192> doc;
-  DeserializationError error = deserializeJson(doc, config);
+  deserializeJson(doc, config);
   const char* id = doc["id"];
   const char* otaServerUrl = doc["otaServerUrl"];
   const char* serverUrl = doc["serverUrl"];
