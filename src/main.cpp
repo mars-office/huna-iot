@@ -28,7 +28,6 @@ void setup()
 void loop()
 {
   delay(1000);
-  netMan.debug();
   digitalWrite(LED, HIGH);
   delay(100);
   digitalWrite(LED, LOW);
