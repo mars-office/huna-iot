@@ -4,7 +4,7 @@
 
 NetworkManager::NetworkManager()
 {
-  this->modem = new TinyGsm(Serial1);
+  this->modem = new TinyGsm(Serial2);
 }
 
 NetworkManager::~NetworkManager()
@@ -14,7 +14,7 @@ NetworkManager::~NetworkManager()
 
 void NetworkManager::init()
 {
-  Serial1.begin(115200);
+  Serial2.begin(115200);
   delay(3000);
   Serial.println("[NetworkManager] Restarting modem...");
   this->modem->init();
