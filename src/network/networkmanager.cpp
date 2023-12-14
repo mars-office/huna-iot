@@ -1,12 +1,8 @@
 #include "networkmanager.h"
-#define MODEM_TX             27
-#define MODEM_RX             26
-
 
 NetworkManager::NetworkManager()
 {
-  this->modem = new TinyGsm(Serial1);
-  
+  this->modem = new TinyGsm(Serial2);
 }
 
 NetworkManager::~NetworkManager()
@@ -16,14 +12,38 @@ NetworkManager::~NetworkManager()
 
 void NetworkManager::init()
 {
-  Serial1.begin(115200, SERIAL_8N1, MODEM_RX, MODEM_TX);
-  delay(3000);
-  Serial.println("[NetworkManager] Restarting modem...");
-  this->modem->restart();
-  Serial.println("[NetworkManager] Modem restarted.");
+  Serial2.begin(115200);
+  Serial.println("[NetworkManager] Initializing modem...");
+  if (!this->modem->isNetworkConnected()) {
+    this->modem->init();
+  }
+  Serial.println("[NetworkManager] Modem initialized.");
 }
 
-void NetworkManager::debug()
+void NetworkManager::ensureRegistrationOnNetwork()
 {
+  while (!this->modem->waitForNetwork())
+  {
+    Serial.println("[NetworkManager] No network, waiting 60s...");
+  }
+}
 
+void NetworkManager::ensureGprsIsConnected()
+{
+  while (!this->modem->isGprsConnected())
+  {
+    Serial.println("[NetworkManager] GPRS not connected");
+    Serial.println("[NetworkManager] GPRS connecting...");
+    if (!this->modem->gprsConnect("net"))
+    {
+      Serial.println("[NetworkManager] GPRS connection failed.");
+    }
+    else
+    {
+      Serial.println("[NetworkManager] GPRS connected");
+      break;
+    }
+    Serial.println("[NetworkManager] Waiting 5s");
+    delay(5000);
+  }
 }

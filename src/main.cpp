@@ -3,8 +3,6 @@
 #include "config/config.h"
 #include "network/networkmanager.h"
 
-#define LED 2
-
 Config config;
 NetworkManager netMan;
 
@@ -22,14 +20,14 @@ void setup()
   Serial.print("Server URL:");
   Serial.println(config.getServerUrl());
   netMan.init();
-  pinMode(LED, OUTPUT);
+  netMan.ensureRegistrationOnNetwork();
+  netMan.ensureGprsIsConnected();
 }
 
 void loop()
 {
-  delay(1000);
-  digitalWrite(LED, HIGH);
-  delay(100);
-  digitalWrite(LED, LOW);
+  netMan.ensureRegistrationOnNetwork();
+  netMan.ensureGprsIsConnected();
   Serial.println("Hello!");
+  delay(1000);
 }

@@ -10,6 +10,8 @@ public:
     char* getClientCertificate();
     char* getClientKey();
     char* getCaCertificate();
+    char* getMqttServer();
+    int getMqttPort();
 
 private:
     char* serverUrl;
@@ -18,4 +20,6 @@ private:
     char* clientCertificate;
     char* clientKey;
     char* caCertificate;
+    char* mqttServer;
+    int mqttPort;
 };

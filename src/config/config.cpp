@@ -15,6 +15,7 @@ Config::~Config()
   delete[] this->id;
   delete[] this->otaServerUrl;
   delete[] this->serverUrl;
+  delete[] this->mqttServer;
 }
 
 void Config::init()
@@ -33,19 +34,23 @@ void Config::init()
   const char* config = fileManager->readFile("/config.json");
   delete fileManager;
 
-  StaticJsonDocument<192> doc;
+  StaticJsonDocument<256> doc;
   deserializeJson(doc, config);
   const char* id = doc["id"];
   const char* otaServerUrl = doc["otaServerUrl"];
   const char* serverUrl = doc["serverUrl"];
+  const char* mqttServer = doc["mqttServer"];
 
   this->id = new char[strlen(id) + 1];
   this->otaServerUrl = new char[strlen(otaServerUrl) + 1];
   this->serverUrl = new char[strlen(serverUrl) + 1];
+  this->mqttServer = new char[strlen(mqttServer) + 1];
 
   strcpy(this->id, id);
   strcpy(this->otaServerUrl, otaServerUrl);
   strcpy(this->serverUrl, serverUrl);
+  strcpy(this->mqttServer, mqttServer);
+  this->mqttPort = doc["mqttPort"];
 }
 
 char *Config::getServerUrl()
@@ -76,4 +81,14 @@ char *Config::getClientKey()
 char *Config::getCaCertificate()
 {
   return this->caCertificate;
+}
+
+char *Config::getMqttServer()
+{
+  return this->mqttServer;
+}
+
+int Config::getMqttPort()
+{
+  return this->mqttPort;
 }

@@ -1,6 +1,7 @@
 {
   "files.associations": {
     "Caddyfile": "ini",
-    "new": "cpp"
+    "new": "cpp",
+    "*.tpp": "cpp"
   }
 }
