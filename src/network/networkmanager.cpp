@@ -1,12 +1,27 @@
 #include "networkmanager.h"
-
-NetworkManager::NetworkManager()
+#ifdef DUMP_AT_COMMANDS
+#include <StreamDebugger.h>
+#endif
+NetworkManager::NetworkManager(Config *config)
 {
+  this->config = config;
+#ifdef DUMP_AT_COMMANDS
+  StreamDebugger* debugger = new StreamDebugger(Serial2, Serial);
+  this->modem = new TinyGsm(*debugger);
+#else
   this->modem = new TinyGsm(Serial2);
+#endif
+
+  this->client = new TinyGsmClientSecure(*this->modem);
+  this->mqtt = new PubSubClient(*this->client);
+  Serial.println("[NetworkManager] Setting up MQTT...");
+  this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
 }
 
 NetworkManager::~NetworkManager()
 {
+  delete this->mqtt;
+  delete this->client;
   delete this->modem;
 }
 
@@ -14,7 +29,8 @@ void NetworkManager::init()
 {
   Serial2.begin(115200);
   Serial.println("[NetworkManager] Initializing modem...");
-  if (!this->modem->isNetworkConnected()) {
+  if (!this->modem->isNetworkConnected())
+  {
     this->modem->init();
   }
   Serial.println("[NetworkManager] Modem initialized.");
@@ -45,5 +61,22 @@ void NetworkManager::ensureGprsIsConnected()
     }
     Serial.println("[NetworkManager] Waiting 5s");
     delay(5000);
+  }
+}
+
+void NetworkManager::ensureMqttIsConnected()
+{
+  while (!this->mqtt->connected())
+  {
+    Serial.println("[NetworkManager] MQTT not connected.");
+    if (!this->mqtt->connect(this->config->getId()))
+    {
+      Serial.println("[NetworkManager] MQTT connection failed. Waiting 5s...");
+      delay(5000);
+    }
+    else
+    {
+      Serial.println("[NetworkManager] MQTT connected.");
+    }
   }
 }
