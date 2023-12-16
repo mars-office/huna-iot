@@ -13,11 +13,11 @@ NetworkManager::NetworkManager(Config *config)
 #endif
 
   this->client = new TinyGsmClient(*this->modem);
-  this->sslClient = new SSLClient(this->client);
-  this->sslClient->setCACert(this->config->getCaCertificate());
-  this->sslClient->setPrivateKey(this->config->getClientKey());
-  this->sslClient->setCertificate(this->config->getClientCertificate());
-  this->mqtt = new PubSubClient(*this->sslClient);
+  //this->sslClient = new SSLClient(this->client);
+  //this->sslClient->setCACert(this->config->getCaCertificate());
+  //this->sslClient->setPrivateKey(this->config->getClientKey());
+  //this->sslClient->setCertificate(this->config->getClientCertificate());
+  this->mqtt = new PubSubClient(*this->client);
   Serial.println("[NetworkManager] Setting up MQTT...");
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
 }
@@ -44,9 +44,9 @@ void NetworkManager::init()
 
 void NetworkManager::ensureRegistrationOnNetwork()
 {
-  while (!this->modem->waitForNetwork())
+  while (!this->modem->waitForNetwork(10000))
   {
-    Serial.println("[NetworkManager] No network, waiting 60s...");
+    Serial.println("[NetworkManager] No network, waiting 10s...");
   }
 }
 

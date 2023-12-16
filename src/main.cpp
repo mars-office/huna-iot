@@ -24,6 +24,7 @@ void setup()
   netMan->init();
   netMan->ensureRegistrationOnNetwork();
   netMan->ensureGprsIsConnected();
+  netMan->ensureMqttIsConnected();
 }
 
 void loop()

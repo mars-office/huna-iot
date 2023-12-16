@@ -1,7 +1,7 @@
 #define TINY_GSM_MODEM_SIM800
 #define TINY_GSM_RX_BUFFER 1024
 #define TINY_GSM_USE_GPRS true
-#define DUMP_AT_COMMANDS
+// #define DUMP_AT_COMMANDS
 #define TINY_GSM_DEBUG Serial
 
 #include <TinyGsmClient.h>

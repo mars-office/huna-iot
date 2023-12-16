@@ -50,7 +50,7 @@ void Config::init()
   strcpy(this->otaServerUrl, otaServerUrl);
   strcpy(this->serverUrl, serverUrl);
   strcpy(this->mqttServer, mqttServer);
-  this->mqttPort = doc["mqttPort"];
+  this->mqttPort = doc["mqttPort"].as<int>();
 }
 
 char *Config::getServerUrl()
