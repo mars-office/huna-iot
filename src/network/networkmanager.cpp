@@ -6,7 +6,7 @@ NetworkManager::NetworkManager(Config *config)
 {
   this->config = config;
 #ifdef DUMP_AT_COMMANDS
-  StreamDebugger* debugger = new StreamDebugger(Serial2, Serial);
+  StreamDebugger *debugger = new StreamDebugger(Serial2, Serial);
   this->modem = new TinyGsm(*debugger);
 #else
   this->modem = new TinyGsm(Serial2);
@@ -33,6 +33,7 @@ void NetworkManager::init()
   {
     this->modem->init();
   }
+  delay(10000);
   Serial.println("[NetworkManager] Modem initialized.");
 }
 
