@@ -3,13 +3,12 @@
 #define TINY_GSM_USE_GPRS true
 #define DUMP_AT_COMMANDS
 #define TINY_GSM_DEBUG Serial
-#define CERT_FILE "C:\\ssl\\ca.crt"
 
 #include <TinyGsmClient.h>
 #include <HardwareSerial.h>
 #include <PubSubClient.h>
+#include "SSLClient.h"
 #include "../config/config.h"
-#include <time.h>
 
 class NetworkManager
 {
@@ -20,10 +19,11 @@ public:
   void ensureRegistrationOnNetwork();
   void ensureGprsIsConnected();
   void ensureMqttIsConnected();
-
+  void mqttCallback(char *topic, byte *payload, unsigned int length);
 private:
   TinyGsm* modem;
-  TinyGsmClientSecure* client;
+  TinyGsmClient* client;
   PubSubClient* mqtt;
   Config* config;
+  SSLClient* sslClient;
 };

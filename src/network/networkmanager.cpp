@@ -12,8 +12,12 @@ NetworkManager::NetworkManager(Config *config)
   this->modem = new TinyGsm(Serial2);
 #endif
 
-  this->client = new TinyGsmClientSecure(*this->modem);
-  this->mqtt = new PubSubClient(*this->client);
+  this->client = new TinyGsmClient(*this->modem);
+  this->sslClient = new SSLClient(this->client);
+  this->sslClient->setCACert(this->config->getCaCertificate());
+  this->sslClient->setPrivateKey(this->config->getClientKey());
+  this->sslClient->setCertificate(this->config->getClientCertificate());
+  this->mqtt = new PubSubClient(*this->sslClient);
   Serial.println("[NetworkManager] Setting up MQTT...");
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
 }
@@ -21,6 +25,7 @@ NetworkManager::NetworkManager(Config *config)
 NetworkManager::~NetworkManager()
 {
   delete this->mqtt;
+  delete this->sslClient;
   delete this->client;
   delete this->modem;
 }
@@ -33,7 +38,7 @@ void NetworkManager::init()
   {
     this->modem->init();
   }
-  delay(10000);
+  delay(1000);
   Serial.println("[NetworkManager] Modem initialized.");
 }
 
@@ -80,4 +85,17 @@ void NetworkManager::ensureMqttIsConnected()
       Serial.println("[NetworkManager] MQTT connected.");
     }
   }
+}
+
+void NetworkManager::mqttCallback(char *topic, uint8_t *payload, unsigned int length)
+{
+
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++)
+  {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
 }
