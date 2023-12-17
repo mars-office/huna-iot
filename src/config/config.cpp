@@ -24,12 +24,15 @@ void Config::init()
   const char* clientCertificate = fileManager->readFile("/client.crt");
   const char* clientKey = fileManager->readFile("/client.key");
   const char* caCertificate = fileManager->readFile("/ca.crt");
+  const char* letsencryptCaCertificate = fileManager->readFile("/le_ca.crt");
+  this->letsencryptCaCertificate = new char[strlen(letsencryptCaCertificate) + 1];
   this->clientCertificate = new char[strlen(clientCertificate) + 1];
   this->clientKey = new char[strlen(clientKey) + 1];
   this->caCertificate = new char[strlen(caCertificate) + 1];
   strcpy(this->clientCertificate, clientCertificate);
   strcpy(this->clientKey, clientKey);
   strcpy(this->caCertificate, caCertificate);
+  strcpy(this->letsencryptCaCertificate, letsencryptCaCertificate);
 
   const char* config = fileManager->readFile("/config.json");
   delete fileManager;
@@ -103,4 +106,9 @@ int Config::getOtaServerPort()
 int Config::getServerPort()
 {
   return this->serverPort;
+}
+
+char *Config::getLetsencryptCaCertificate()
+{
+  return this->letsencryptCaCertificate;
 }

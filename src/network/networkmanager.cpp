@@ -2,6 +2,7 @@
 #ifdef DUMP_AT_COMMANDS
 #include <StreamDebugger.h>
 #endif
+
 NetworkManager::NetworkManager(Config *config)
 {
   this->config = config;
@@ -12,7 +13,6 @@ NetworkManager::NetworkManager(Config *config)
   this->modem = new TinyGsm(Serial2);
 #endif
   this->pubsubTinyGsmClient = new TinyGsmClient(*this->modem, 0U);
-  this->httpTinyGsmClient = new TinyGsmClient(*this->modem, 1U);
   this->pubsubSslClient = new SSLClientESP32(this->pubsubTinyGsmClient);
   this->pubsubSslClient->setCACert(this->config->getCaCertificate());
   this->pubsubSslClient->setPrivateKey(this->config->getClientKey());
@@ -20,8 +20,8 @@ NetworkManager::NetworkManager(Config *config)
   this->mqtt = new PubSubClient(*this->pubsubSslClient);
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
 
-  this->httpSslClient = new SSLClientESP32(this->httpTinyGsmClient);
-  this->httpSslClient->setCACert(this->config->getCaCertificate());
+  this->httpSslClient = new SSLClientESP32(this->pubsubTinyGsmClient);
+  this->httpSslClient->setCACert(this->config->getLetsencryptCaCertificate());
   this->httpSslClient->setPrivateKey(this->config->getClientKey());
   this->httpSslClient->setCertificate(this->config->getClientCertificate());
   this->httpClient = new HttpClient(*this->httpSslClient, String(this->config->getServer()), (uint16_t)this->config->getServerPort());
@@ -34,7 +34,6 @@ NetworkManager::~NetworkManager()
   delete this->httpSslClient;
   delete this->pubsubSslClient;
   delete this->pubsubTinyGsmClient;
-  delete this->httpTinyGsmClient;
   delete this->modem;
 }
 

@@ -41,11 +41,11 @@ void setup()
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
   netMan->setMqttCallback(mqttCallback);
-  netMan->ensureMqttIsConnected();
+  //netMan->ensureMqttIsConnected();
   delay(500);
-  if (!netMan->mqttSubscribe("gigel", 0)) {
-    Serial.println("Could not subscribe to topic");
-  }
+  // if (!netMan->mqttSubscribe("gigel", 0)) {
+  //   Serial.println("Could not subscribe to topic");
+  // }
   Serial.println(netMan->httpGetString(true, "/api/ota/version"));
 }
 

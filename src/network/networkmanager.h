@@ -1,6 +1,6 @@
 #define TINY_GSM_MODEM_SIM800
 #define TINY_GSM_USE_GPRS true
-// #define DUMP_AT_COMMANDS
+#define DUMP_AT_COMMANDS
 #define TINY_GSM_RX_BUFFER 1024 
 
 #include <TinyGsmClient.h>
@@ -28,7 +28,6 @@ public:
 private:
   TinyGsm* modem;
   TinyGsmClient* pubsubTinyGsmClient;
-  TinyGsmClient* httpTinyGsmClient;
   PubSubClient* mqtt;
   Config* config;
   SSLClientESP32* pubsubSslClient;

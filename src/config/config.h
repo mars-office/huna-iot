@@ -14,6 +14,7 @@ public:
     int getMqttPort();
     int getOtaServerPort();
     int getServerPort();
+    char* getLetsencryptCaCertificate();
 private:
     char* server;
     char* otaServer;
@@ -23,6 +24,7 @@ private:
     char* clientCertificate;
     char* clientKey;
     char* caCertificate;
+    char* letsencryptCaCertificate;
     char* mqttServer;
     int mqttPort;
 };
