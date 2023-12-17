@@ -17,6 +17,7 @@ NetworkManager::NetworkManager(Config *config)
   this->sslClient->setCACert(this->config->getCaCertificate());
   this->sslClient->setPrivateKey(this->config->getClientKey());
   this->sslClient->setCertificate(this->config->getClientCertificate());
+  this->sslClient->setHandshakeTimeout(10);
   this->mqtt = new PubSubClient(*this->sslClient);
   Serial.println("[NetworkManager] Setting up MQTT...");
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
