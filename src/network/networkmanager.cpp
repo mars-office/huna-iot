@@ -11,15 +11,27 @@ NetworkManager::NetworkManager(Config *config)
 #else
   this->modem = new TinyGsm(Serial2);
 #endif
-  this->client = new TinyGsmClient(*this->modem);
-  this->sslClient = new SSLClientESP32(this->client);
-  this->sslClient->setCACert(this->config->getCaCertificate());
-  this->sslClient->setPrivateKey(this->config->getClientKey());
-  this->sslClient->setCertificate(this->config->getClientCertificate());
-  this->mqtt = new PubSubClient(*this->sslClient);
+  this->pubsubTinyGsmClient = new TinyGsmClient(*this->modem, 0U);
+  this->httpOtaTinyGsmClient = new TinyGsmClient(*this->modem, 1U);
+  this->httpTinyGsmClient = new TinyGsmClient(*this->modem, 2U);
+  this->pubsubSslClient = new SSLClientESP32(this->pubsubTinyGsmClient);
+  this->pubsubSslClient->setCACert(this->config->getCaCertificate());
+  this->pubsubSslClient->setPrivateKey(this->config->getClientKey());
+  this->pubsubSslClient->setCertificate(this->config->getClientCertificate());
+  this->mqtt = new PubSubClient(*this->pubsubSslClient);
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
-  this->otaHttpClient = new HttpClient(*this->sslClient, String(this->config->getOtaServer()), (uint16_t)this->config->getOtaServerPort());
-  this->httpClient = new HttpClient(*this->sslClient, String(this->config->getServer()), (uint16_t)this->config->getServerPort());
+
+  this->httpSslClient = new SSLClientESP32(this->httpTinyGsmClient);
+  this->httpSslClient->setCACert(this->config->getCaCertificate());
+  this->httpSslClient->setPrivateKey(this->config->getClientKey());
+  this->httpSslClient->setCertificate(this->config->getClientCertificate());
+  this->httpClient = new HttpClient(*this->httpSslClient, String(this->config->getServer()), (uint16_t)this->config->getServerPort());
+
+  this->httpOtaSslClient = new SSLClientESP32(this->httpOtaTinyGsmClient);
+  this->httpOtaSslClient->setCACert(this->config->getCaCertificate());
+  this->httpOtaSslClient->setPrivateKey(this->config->getClientKey());
+  this->httpOtaSslClient->setCertificate(this->config->getClientCertificate());
+  this->otaHttpClient = new HttpClient(*this->httpOtaSslClient, String(this->config->getOtaServer()), (uint16_t)this->config->getOtaServerPort());
 }
 
 NetworkManager::~NetworkManager()
@@ -27,8 +39,12 @@ NetworkManager::~NetworkManager()
   delete this->mqtt;
   delete this->otaHttpClient;
   delete this->httpClient;
-  delete this->sslClient;
-  delete this->client;
+  delete this->httpSslClient;
+  delete this->httpOtaSslClient;
+  delete this->pubsubSslClient;
+  delete this->pubsubTinyGsmClient;
+  delete this->httpTinyGsmClient;
+  delete this->httpOtaTinyGsmClient;
   delete this->modem;
 }
 
@@ -113,7 +129,7 @@ void NetworkManager::receiveMqttEvents()
   this->mqtt->loop();
 }
 
-void NetworkManager::setMqttCallback(std::function<void (char*,uint8_t*,unsigned int)> cb)
+void NetworkManager::setMqttCallback(std::function<void(char *, uint8_t *, unsigned int)> cb)
 {
   this->mqtt->setCallback(cb);
 }
@@ -128,7 +144,26 @@ bool NetworkManager::mqttUnsubscribe(const char *topic)
   return this->mqtt->unsubscribe(topic);
 }
 
-char *NetworkManager::httpGetString(char *url)
+char *NetworkManager::httpGetString(bool useOtaServer, const char *url)
 {
-  return nullptr;
+  char *result = nullptr;
+  HttpClient *client = this->getHttpClient(useOtaServer);
+  if (client->connect(useOtaServer ? this->config->getOtaServer() : this->config->getServer(),
+                      useOtaServer ? this->config->getOtaServerPort() : this->config->getServerPort()))
+  {
+    if (client->get(url) == 0 && client->responseStatusCode() == 200)
+    {
+      const char *response = client->responseBody().c_str();
+      result = new char[strlen(response) + 1];
+      strcpy(result, response);
+    }
+    client->stop();
+  }
+  delete client;
+  return result;
+}
+
+HttpClient *NetworkManager::getHttpClient(bool useOtaServer)
+{
+  return useOtaServer ? this->otaHttpClient : this->httpClient;
 }

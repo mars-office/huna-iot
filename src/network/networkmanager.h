@@ -24,13 +24,18 @@ public:
   void setMqttCallback(std::function<void (char*,uint8_t*,unsigned int)> cb);
   bool mqttSubscribe(const char *topic, uint8_t qos);
   bool mqttUnsubscribe(const char* topic);
+  char* httpGetString(bool useOtaServer, const char* url);
 private:
   TinyGsm* modem;
-  TinyGsmClient* client;
+  TinyGsmClient* pubsubTinyGsmClient;
+  TinyGsmClient* httpTinyGsmClient;
+  TinyGsmClient* httpOtaTinyGsmClient;
   PubSubClient* mqtt;
   Config* config;
-  SSLClientESP32* sslClient;
+  SSLClientESP32* pubsubSslClient;
+  SSLClientESP32* httpSslClient;
+  SSLClientESP32* httpOtaSslClient;
   HttpClient* otaHttpClient;
   HttpClient* httpClient;
-  char* httpGetString(char* url);
+  HttpClient* getHttpClient(bool useOtaServer);
 };

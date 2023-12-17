@@ -46,6 +46,7 @@ void setup()
   if (!netMan->mqttSubscribe("gigel", 0)) {
     Serial.println("Could not subscribe to topic");
   }
+  Serial.println(netMan->httpGetString(true, "/api/ota/version"));
 }
 
 void loop()
