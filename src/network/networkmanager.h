@@ -18,7 +18,7 @@ public:
   void ensureRegistrationOnNetwork();
   void ensureGprsIsConnected();
   void ensureMqttIsConnected();
-  void ntpSync();
+  const struct timeval fetchGSMTime();
   void receiveMqttEvents();
 private:
   TinyGsm* modem;

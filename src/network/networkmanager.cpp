@@ -35,7 +35,7 @@ void NetworkManager::init()
   Serial2.begin(115200);
   Serial.println("[NetworkManager] Initializing modem...");
   this->modem->init();
-  delay(10000);
+  delay(1000);
   Serial.println("[NetworkManager] Modem initialized.");
 }
 
@@ -84,9 +84,26 @@ void NetworkManager::ensureMqttIsConnected()
   }
 }
 
-void NetworkManager::ntpSync()
+const struct timeval NetworkManager::fetchGSMTime()
 {
-  this->modem->NTPServerSync("pool.ntp.org", 20);
+  int hh, mm, ss, yy, mon, day, tz;
+  struct tm when = {0};
+  time_t epoch = 0;
+  String currentDt = this->modem->getGSMDateTime(DATE_FULL);
+  sscanf(currentDt.c_str(), "%d/%d/%d,%d:%d:%d-%d", &yy, &mon, &day, &hh, &mm, &ss, &tz);
+  when.tm_hour = hh;
+  when.tm_min = mm;
+  when.tm_sec = ss;
+  when.tm_year = 2000 + yy - 1900;
+
+  when.tm_mon = mon - 1;
+  when.tm_mday = day;
+  when.tm_isdst = -1;
+  epoch = mktime(&when);
+  struct timeval tv;
+  tv.tv_sec = epoch + 1;
+  tv.tv_usec = 0;
+  return tv;
 }
 
 void NetworkManager::receiveMqttEvents()
