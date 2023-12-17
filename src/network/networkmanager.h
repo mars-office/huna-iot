@@ -1,8 +1,7 @@
 #define TINY_GSM_MODEM_SIM800
 #define TINY_GSM_RX_BUFFER 1024
 #define TINY_GSM_USE_GPRS true
-// #define DUMP_AT_COMMANDS
-#define TINY_GSM_DEBUG Serial
+#define DUMP_AT_COMMANDS
 
 #include <TinyGsmClient.h>
 #include <HardwareSerial.h>
@@ -19,7 +18,7 @@ public:
   void ensureRegistrationOnNetwork();
   void ensureGprsIsConnected();
   void ensureMqttIsConnected();
-  void mqttCallback(char *topic, byte *payload, unsigned int length);
+  void receiveMqttEvents();
 private:
   TinyGsm* modem;
   TinyGsmClient* client;

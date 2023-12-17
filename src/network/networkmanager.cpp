@@ -13,11 +13,11 @@ NetworkManager::NetworkManager(Config *config)
 #endif
 
   this->client = new TinyGsmClient(*this->modem);
-  //this->sslClient = new SSLClient(this->client);
-  //this->sslClient->setCACert(this->config->getCaCertificate());
-  //this->sslClient->setPrivateKey(this->config->getClientKey());
-  //this->sslClient->setCertificate(this->config->getClientCertificate());
-  this->mqtt = new PubSubClient(*this->client);
+  this->sslClient = new SSLClient(this->client);
+  this->sslClient->setCACert(this->config->getCaCertificate());
+  this->sslClient->setPrivateKey(this->config->getClientKey());
+  this->sslClient->setCertificate(this->config->getClientCertificate());
+  this->mqtt = new PubSubClient(*this->sslClient);
   Serial.println("[NetworkManager] Setting up MQTT...");
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
 }
@@ -34,19 +34,16 @@ void NetworkManager::init()
 {
   Serial2.begin(115200);
   Serial.println("[NetworkManager] Initializing modem...");
-  if (!this->modem->isNetworkConnected())
-  {
-    this->modem->init();
-  }
-  delay(1000);
+  this->modem->init();
+  delay(10000);
   Serial.println("[NetworkManager] Modem initialized.");
 }
 
 void NetworkManager::ensureRegistrationOnNetwork()
 {
-  while (!this->modem->waitForNetwork(10000))
+  while (!this->modem->waitForNetwork())
   {
-    Serial.println("[NetworkManager] No network, waiting 10s...");
+    Serial.println("[NetworkManager] No network, waiting 60s...");
   }
 }
 
@@ -87,15 +84,7 @@ void NetworkManager::ensureMqttIsConnected()
   }
 }
 
-void NetworkManager::mqttCallback(char *topic, uint8_t *payload, unsigned int length)
+void NetworkManager::receiveMqttEvents()
 {
-
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
-  for (int i = 0; i < length; i++)
-  {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
+  this->mqtt->loop();
 }

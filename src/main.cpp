@@ -9,7 +9,6 @@ NetworkManager* netMan;
 void setup()
 {
   config = new Config();
-  netMan = new NetworkManager(config);
   Serial.begin(115200);
   delay(10);
   Serial.print("Version:");
@@ -21,10 +20,11 @@ void setup()
   Serial.println(config->getId());
   Serial.print("Server URL:");
   Serial.println(config->getServerUrl());
+  netMan = new NetworkManager(config);
   netMan->init();
   netMan->ensureRegistrationOnNetwork();
   netMan->ensureGprsIsConnected();
-  netMan->ensureMqttIsConnected();
+  // netMan->ensureMqttIsConnected();
 }
 
 void loop()
@@ -33,6 +33,6 @@ void loop()
   netMan->ensureGprsIsConnected();
   netMan->ensureMqttIsConnected();
   Serial.println("Hello!");
-  
-  delay(60000);
+  netMan->receiveMqttEvents();
+  delay(1000);
 }
