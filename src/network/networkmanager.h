@@ -8,6 +8,7 @@
 #include <PubSubClient.h>
 #include "SSLClientESP32.h"
 #include "../config/config.h"
+#include <ArduinoHttpClient.h>
 
 class NetworkManager
 {
@@ -26,4 +27,7 @@ private:
   PubSubClient* mqtt;
   Config* config;
   SSLClientESP32* sslClient;
+  HttpClient* otaHttpClient;
+  HttpClient* httpClient;
+  char* httpGetString(char* url);
 };

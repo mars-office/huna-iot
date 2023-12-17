@@ -4,18 +4,21 @@ public:
     ~Config();
 
     void init();
-    char* getServerUrl();
-    char* getOtaServerUrl();
+    char* getServer();
+    char* getOtaServer();
     char* getId();
     char* getClientCertificate();
     char* getClientKey();
     char* getCaCertificate();
     char* getMqttServer();
     int getMqttPort();
-
+    int getOtaServerPort();
+    int getServerPort();
 private:
-    char* serverUrl;
-    char* otaServerUrl;
+    char* server;
+    char* otaServer;
+    int otaServerPort;
+    int serverPort;
     char* id;
     char* clientCertificate;
     char* clientKey;

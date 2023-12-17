@@ -18,11 +18,15 @@ NetworkManager::NetworkManager(Config *config)
   this->sslClient->setCertificate(this->config->getClientCertificate());
   this->mqtt = new PubSubClient(*this->sslClient);
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
+  this->otaHttpClient = new HttpClient(*this->sslClient, String(this->config->getOtaServer()), (uint16_t)this->config->getOtaServerPort());
+  this->httpClient = new HttpClient(*this->sslClient, String(this->config->getServer()), (uint16_t)this->config->getServerPort());
 }
 
 NetworkManager::~NetworkManager()
 {
   delete this->mqtt;
+  delete this->otaHttpClient;
+  delete this->httpClient;
   delete this->sslClient;
   delete this->client;
   delete this->modem;
@@ -107,4 +111,9 @@ const struct timeval NetworkManager::fetchGSMTime()
 void NetworkManager::receiveMqttEvents()
 {
   this->mqtt->loop();
+}
+
+char *NetworkManager::httpGetString(char *url)
+{
+  return nullptr;
 }

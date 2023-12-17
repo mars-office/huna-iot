@@ -13,8 +13,8 @@ Config::~Config()
   delete[] this->clientCertificate;
   delete[] this->clientKey;
   delete[] this->id;
-  delete[] this->otaServerUrl;
-  delete[] this->serverUrl;
+  delete[] this->otaServer;
+  delete[] this->server;
   delete[] this->mqttServer;
 }
 
@@ -34,33 +34,35 @@ void Config::init()
   const char* config = fileManager->readFile("/config.json");
   delete fileManager;
 
-  StaticJsonDocument<256> doc;
+  StaticJsonDocument<384> doc;
   deserializeJson(doc, config);
   const char* id = doc["id"];
-  const char* otaServerUrl = doc["otaServerUrl"];
-  const char* serverUrl = doc["serverUrl"];
+  const char* otaServer = doc["otaServer"];
+  const char* server = doc["server"];
   const char* mqttServer = doc["mqttServer"];
 
   this->id = new char[strlen(id) + 1];
-  this->otaServerUrl = new char[strlen(otaServerUrl) + 1];
-  this->serverUrl = new char[strlen(serverUrl) + 1];
+  this->otaServer = new char[strlen(otaServer) + 1];
+  this->server = new char[strlen(server) + 1];
   this->mqttServer = new char[strlen(mqttServer) + 1];
 
   strcpy(this->id, id);
-  strcpy(this->otaServerUrl, otaServerUrl);
-  strcpy(this->serverUrl, serverUrl);
+  strcpy(this->otaServer, otaServer);
+  strcpy(this->server, server);
   strcpy(this->mqttServer, mqttServer);
   this->mqttPort = doc["mqttPort"].as<int>();
+  this->otaServerPort = doc["otaServerPort"].as<int>();
+  this->serverPort = doc["serverPort"].as<int>();
 }
 
-char *Config::getServerUrl()
+char *Config::getServer()
 {
-  return this->serverUrl;
+  return this->server;
 }
 
-char *Config::getOtaServerUrl()
+char *Config::getOtaServer()
 {
-  return this->otaServerUrl;
+  return this->otaServer;
 }
 
 char *Config::getId()
@@ -91,4 +93,14 @@ char *Config::getMqttServer()
 int Config::getMqttPort()
 {
   return this->mqttPort;
+}
+
+int Config::getOtaServerPort()
+{
+  return this->otaServerPort;
+}
+
+int Config::getServerPort()
+{
+  return this->serverPort;
 }
