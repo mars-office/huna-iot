@@ -20,7 +20,7 @@ void setup()
   Serial.print("ID:");
   Serial.println(config->getId());
   Serial.print("Server URL:");
-  Serial.println(config->getServerUrl());
+  Serial.println(config->getServer());
   netMan = new NetworkManager(config);
   netMan->init();
   netMan->ensureRegistrationOnNetwork();
