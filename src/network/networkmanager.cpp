@@ -24,6 +24,8 @@ NetworkManager::NetworkManager(Config *config)
   this->httpSslClient->setCACert(this->config->getCaCertificate());
   this->httpSslClient->setPrivateKey(this->config->getClientKey());
   this->httpSslClient->setCertificate(this->config->getClientCertificate());
+  this->httpSslClient->setHandshakeTimeout(30000U);
+  this->httpSslClient->setInsecure();
   this->httpClient = new HttpClient(*this->httpSslClient, String(this->config->getDetectionServer()), (uint16_t)this->config->getDetectionServerPort());
 }
 
