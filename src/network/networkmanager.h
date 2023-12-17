@@ -6,7 +6,7 @@
 #include <TinyGsmClient.h>
 #include <HardwareSerial.h>
 #include <PubSubClient.h>
-#include "SSLClient.h"
+#include "SSLClientESP32.h"
 #include "../config/config.h"
 
 class NetworkManager
@@ -25,5 +25,5 @@ private:
   TinyGsmClient* client;
   PubSubClient* mqtt;
   Config* config;
-  SSLClient* sslClient;
+  SSLClientESP32* sslClient;
 };

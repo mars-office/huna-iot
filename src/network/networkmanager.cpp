@@ -12,11 +12,10 @@ NetworkManager::NetworkManager(Config *config)
   this->modem = new TinyGsm(Serial2);
 #endif
   this->client = new TinyGsmClient(*this->modem);
-  this->sslClient = new SSLClient(this->client);
+  this->sslClient = new SSLClientESP32(this->client);
   this->sslClient->setCACert(this->config->getCaCertificate());
   this->sslClient->setPrivateKey(this->config->getClientKey());
   this->sslClient->setCertificate(this->config->getClientCertificate());
-  this->sslClient->setHandshakeTimeout(10);
   this->mqtt = new PubSubClient(*this->sslClient);
   Serial.println("[NetworkManager] Setting up MQTT...");
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
