@@ -21,10 +21,10 @@ NetworkManager::NetworkManager(Config *config)
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
 
   this->httpSslClient = new SSLClientESP32(this->pubsubTinyGsmClient);
-  this->httpSslClient->setCACert(this->config->getLetsencryptCaCertificate());
+  this->httpSslClient->setCACert(this->config->getCaCertificate());
   this->httpSslClient->setPrivateKey(this->config->getClientKey());
   this->httpSslClient->setCertificate(this->config->getClientCertificate());
-  this->httpClient = new HttpClient(*this->httpSslClient, String(this->config->getServer()), (uint16_t)this->config->getServerPort());
+  this->httpClient = new HttpClient(*this->httpSslClient, String(this->config->getDetectionServer()), (uint16_t)this->config->getDetectionServerPort());
 }
 
 NetworkManager::~NetworkManager()
@@ -136,8 +136,8 @@ bool NetworkManager::mqttUnsubscribe(const char *topic)
 char *NetworkManager::httpGetString(bool useOtaServer, const char *url)
 {
   char *result = nullptr;
-  if (this->httpClient->connect(useOtaServer ? this->config->getOtaServer() : this->config->getServer(),
-                      useOtaServer ? this->config->getOtaServerPort() : this->config->getServerPort()))
+  if (this->httpClient->connect(useOtaServer ? this->config->getOtaServer() : this->config->getDetectionServer(),
+                      useOtaServer ? this->config->getOtaServerPort() : this->config->getDetectionServerPort()))
   {
     if (this->httpClient->get(url) == 0 && this->httpClient->responseStatusCode() == 200)
     {

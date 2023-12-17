@@ -4,7 +4,7 @@ public:
     ~Config();
 
     void init();
-    char* getServer();
+    char* getDetectionServer();
     char* getOtaServer();
     char* getId();
     char* getClientCertificate();
@@ -13,18 +13,16 @@ public:
     char* getMqttServer();
     int getMqttPort();
     int getOtaServerPort();
-    int getServerPort();
-    char* getLetsencryptCaCertificate();
+    int getDetectionServerPort();
 private:
-    char* server;
+    char* detectionServer;
     char* otaServer;
     int otaServerPort;
-    int serverPort;
+    int detectionServerPort;
     char* id;
     char* clientCertificate;
     char* clientKey;
     char* caCertificate;
-    char* letsencryptCaCertificate;
     char* mqttServer;
     int mqttPort;
 };

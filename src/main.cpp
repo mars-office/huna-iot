@@ -31,8 +31,8 @@ void setup()
   config->init();
   Serial.print("ID:");
   Serial.println(config->getId());
-  Serial.print("Server URL:");
-  Serial.println(config->getServer());
+  Serial.print("Detection Server URL:");
+  Serial.println(config->getDetectionServer());
   netMan = new NetworkManager(config);
   netMan->init();
   netMan->ensureRegistrationOnNetwork();
@@ -41,11 +41,11 @@ void setup()
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
   netMan->setMqttCallback(mqttCallback);
-  // netMan->ensureMqttIsConnected();
+  netMan->ensureMqttIsConnected();
   delay(500);
-  // if (!netMan->mqttSubscribe("gigel", 0)) {
-  //   Serial.println("Could not subscribe to topic");
-  // }
+  if (!netMan->mqttSubscribe("gigel", 0)) {
+    Serial.println("Could not subscribe to topic");
+  }
   Serial.println(netMan->httpGetString(true, "/api/ota/version"));
 }
 
@@ -53,8 +53,8 @@ void loop()
 {
   netMan->ensureRegistrationOnNetwork();
   netMan->ensureGprsIsConnected();
-  //netMan->ensureMqttIsConnected();
+  netMan->ensureMqttIsConnected();
   Serial.println("Hello!");
-  //netMan->receiveMqttEvents();
+  netMan->receiveMqttEvents();
   delay(1000);
 }
