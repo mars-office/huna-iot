@@ -12,30 +12,23 @@ NetworkManager::NetworkManager(Config *config)
 #else
   this->modem = new TinyGsm(Serial2);
 #endif
-  this->pubsubTinyGsmClient = new TinyGsmClient(*this->modem, 0U);
-  this->pubsubSslClient = new SSLClientESP32(this->pubsubTinyGsmClient);
-  this->pubsubSslClient->setCACert(this->config->getCaCertificate());
-  this->pubsubSslClient->setPrivateKey(this->config->getClientKey());
-  this->pubsubSslClient->setCertificate(this->config->getClientCertificate());
-  this->mqtt = new PubSubClient(*this->pubsubSslClient);
+  this->tinyGsmClient = new TinyGsmClient(*this->modem, 0U);
+  this->sslClient = new SSLClientESP32(this->tinyGsmClient);
+  this->sslClient->setCACert(this->config->getCaCertificate());
+  this->sslClient->setPrivateKey(this->config->getClientKey());
+  this->sslClient->setCertificate(this->config->getClientCertificate());
+  this->mqtt = new PubSubClient(*this->sslClient);
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
 
-  this->httpSslClient = new SSLClientESP32(this->pubsubTinyGsmClient);
-  this->httpSslClient->setCACert(this->config->getCaCertificate());
-  this->httpSslClient->setPrivateKey(this->config->getClientKey());
-  this->httpSslClient->setCertificate(this->config->getClientCertificate());
-  this->httpSslClient->setHandshakeTimeout(30000U);
-  this->httpSslClient->setInsecure();
-  this->httpClient = new HttpClient(*this->httpSslClient, String(this->config->getDetectionServer()), (uint16_t)this->config->getDetectionServerPort());
+  this->httpClient = new HttpClient(*this->sslClient, String(this->config->getDetectionServer()), (uint16_t)this->config->getDetectionServerPort());
 }
 
 NetworkManager::~NetworkManager()
 {
   delete this->mqtt;
   delete this->httpClient;
-  delete this->httpSslClient;
-  delete this->pubsubSslClient;
-  delete this->pubsubTinyGsmClient;
+  delete this->sslClient;
+  delete this->tinyGsmClient;
   delete this->modem;
 }
 

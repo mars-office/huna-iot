@@ -1,5 +1,5 @@
 #define TINY_GSM_MODEM_SIM800
-#define DUMP_AT_COMMANDS
+// #define DUMP_AT_COMMANDS
 // #define TINY_GSM_RX_BUFFER 1024 
 
 #include <TinyGsmClient.h>
@@ -26,10 +26,9 @@ public:
   char* httpGetString(bool useOtaServer, const char* url);
 private:
   TinyGsm* modem;
-  TinyGsmClient* pubsubTinyGsmClient;
+  TinyGsmClient* tinyGsmClient;
   PubSubClient* mqtt;
   Config* config;
-  SSLClientESP32* pubsubSslClient;
-  SSLClientESP32* httpSslClient;
+  SSLClientESP32* sslClient;
   HttpClient* httpClient;
 };

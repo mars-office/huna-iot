@@ -40,13 +40,15 @@ void setup()
   const struct timeval tv = netMan->fetchGSMTime();
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
+
+  Serial.println(netMan->httpGetString(true, "/api/ota/version"));
   netMan->setMqttCallback(mqttCallback);
   netMan->ensureMqttIsConnected();
   delay(500);
-  if (!netMan->mqttSubscribe("gigel", 0)) {
+  if (!netMan->mqttSubscribe("gigel", 0))
+  {
     Serial.println("Could not subscribe to topic");
   }
-  Serial.println(netMan->httpGetString(true, "/api/ota/version"));
 }
 
 void loop()
