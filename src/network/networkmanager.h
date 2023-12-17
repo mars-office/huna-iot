@@ -29,13 +29,9 @@ private:
   TinyGsm* modem;
   TinyGsmClient* pubsubTinyGsmClient;
   TinyGsmClient* httpTinyGsmClient;
-  TinyGsmClient* httpOtaTinyGsmClient;
   PubSubClient* mqtt;
   Config* config;
   SSLClientESP32* pubsubSslClient;
   SSLClientESP32* httpSslClient;
-  SSLClientESP32* httpOtaSslClient;
-  HttpClient* otaHttpClient;
   HttpClient* httpClient;
-  HttpClient* getHttpClient(bool useOtaServer);
 };

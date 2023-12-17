@@ -12,8 +12,7 @@ NetworkManager::NetworkManager(Config *config)
   this->modem = new TinyGsm(Serial2);
 #endif
   this->pubsubTinyGsmClient = new TinyGsmClient(*this->modem, 0U);
-  this->httpOtaTinyGsmClient = new TinyGsmClient(*this->modem, 1U);
-  this->httpTinyGsmClient = new TinyGsmClient(*this->modem, 2U);
+  this->httpTinyGsmClient = new TinyGsmClient(*this->modem, 1U);
   this->pubsubSslClient = new SSLClientESP32(this->pubsubTinyGsmClient);
   this->pubsubSslClient->setCACert(this->config->getCaCertificate());
   this->pubsubSslClient->setPrivateKey(this->config->getClientKey());
@@ -26,25 +25,16 @@ NetworkManager::NetworkManager(Config *config)
   this->httpSslClient->setPrivateKey(this->config->getClientKey());
   this->httpSslClient->setCertificate(this->config->getClientCertificate());
   this->httpClient = new HttpClient(*this->httpSslClient, String(this->config->getServer()), (uint16_t)this->config->getServerPort());
-
-  this->httpOtaSslClient = new SSLClientESP32(this->httpOtaTinyGsmClient);
-  this->httpOtaSslClient->setCACert(this->config->getCaCertificate());
-  this->httpOtaSslClient->setPrivateKey(this->config->getClientKey());
-  this->httpOtaSslClient->setCertificate(this->config->getClientCertificate());
-  this->otaHttpClient = new HttpClient(*this->httpOtaSslClient, String(this->config->getOtaServer()), (uint16_t)this->config->getOtaServerPort());
 }
 
 NetworkManager::~NetworkManager()
 {
   delete this->mqtt;
-  delete this->otaHttpClient;
   delete this->httpClient;
   delete this->httpSslClient;
-  delete this->httpOtaSslClient;
   delete this->pubsubSslClient;
   delete this->pubsubTinyGsmClient;
   delete this->httpTinyGsmClient;
-  delete this->httpOtaTinyGsmClient;
   delete this->modem;
 }
 
@@ -147,23 +137,16 @@ bool NetworkManager::mqttUnsubscribe(const char *topic)
 char *NetworkManager::httpGetString(bool useOtaServer, const char *url)
 {
   char *result = nullptr;
-  HttpClient *client = this->getHttpClient(useOtaServer);
-  if (client->connect(useOtaServer ? this->config->getOtaServer() : this->config->getServer(),
+  if (this->httpClient->connect(useOtaServer ? this->config->getOtaServer() : this->config->getServer(),
                       useOtaServer ? this->config->getOtaServerPort() : this->config->getServerPort()))
   {
-    if (client->get(url) == 0 && client->responseStatusCode() == 200)
+    if (this->httpClient->get(url) == 0 && this->httpClient->responseStatusCode() == 200)
     {
-      const char *response = client->responseBody().c_str();
+      const char *response = this->httpClient->responseBody().c_str();
       result = new char[strlen(response) + 1];
       strcpy(result, response);
     }
-    client->stop();
+    this->httpClient->stop();
   }
-  delete client;
   return result;
-}
-
-HttpClient *NetworkManager::getHttpClient(bool useOtaServer)
-{
-  return useOtaServer ? this->otaHttpClient : this->httpClient;
 }
