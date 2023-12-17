@@ -18,6 +18,7 @@ public:
   void ensureRegistrationOnNetwork();
   void ensureGprsIsConnected();
   void ensureMqttIsConnected();
+  void ntpSync();
   void receiveMqttEvents();
 private:
   TinyGsm* modem;

@@ -11,7 +11,6 @@ NetworkManager::NetworkManager(Config *config)
 #else
   this->modem = new TinyGsm(Serial2);
 #endif
-
   this->client = new TinyGsmClient(*this->modem);
   this->sslClient = new SSLClient(this->client);
   this->sslClient->setCACert(this->config->getCaCertificate());
@@ -83,6 +82,11 @@ void NetworkManager::ensureMqttIsConnected()
       Serial.println("[NetworkManager] MQTT connected.");
     }
   }
+}
+
+void NetworkManager::ntpSync()
+{
+  this->modem->NTPServerSync("pool.ntp.org", 20);
 }
 
 void NetworkManager::receiveMqttEvents()
