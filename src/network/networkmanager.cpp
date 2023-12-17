@@ -17,7 +17,6 @@ NetworkManager::NetworkManager(Config *config)
   this->sslClient->setPrivateKey(this->config->getClientKey());
   this->sslClient->setCertificate(this->config->getClientCertificate());
   this->mqtt = new PubSubClient(*this->sslClient);
-  Serial.println("[NetworkManager] Setting up MQTT...");
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
 }
 
@@ -89,7 +88,7 @@ const struct timeval NetworkManager::fetchGSMTime()
   struct tm when = {0};
   time_t epoch = 0;
   String currentDt = this->modem->getGSMDateTime(DATE_FULL);
-  sscanf(currentDt.c_str(), "%d/%d/%d,%d:%d:%d-%d", &yy, &mon, &day, &hh, &mm, &ss, &tz);
+  sscanf(currentDt.c_str(), "%d/%d/%d,%d:%d:%d+%d", &yy, &mon, &day, &hh, &mm, &ss, &tz);
   when.tm_hour = hh;
   when.tm_min = mm;
   when.tm_sec = ss;
