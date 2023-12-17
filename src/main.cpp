@@ -3,9 +3,21 @@
 #include "network/networkmanager.h"
 #include <time.h>
 
-Config* config;
-NetworkManager* netMan;
+Config *config;
+NetworkManager *netMan;
 struct timeval *gsmTime;
+
+void mqttCallback(char *topic, byte *payload, unsigned int length)
+{
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++)
+  {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
 
 void setup()
 {
@@ -28,7 +40,12 @@ void setup()
   const struct timeval tv = netMan->fetchGSMTime();
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
+  netMan->setMqttCallback(mqttCallback);
   netMan->ensureMqttIsConnected();
+  delay(500);
+  if (!netMan->mqttSubscribe("gigel", 0)) {
+    Serial.println("Could not subscribe to topic");
+  }
 }
 
 void loop()

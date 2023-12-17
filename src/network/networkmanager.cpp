@@ -113,6 +113,21 @@ void NetworkManager::receiveMqttEvents()
   this->mqtt->loop();
 }
 
+void NetworkManager::setMqttCallback(std::function<void (char*,uint8_t*,unsigned int)> cb)
+{
+  this->mqtt->setCallback(cb);
+}
+
+bool NetworkManager::mqttSubscribe(const char *topic, uint8_t qos)
+{
+  return this->mqtt->subscribe(topic, qos);
+}
+
+bool NetworkManager::mqttUnsubscribe(const char *topic)
+{
+  return this->mqtt->unsubscribe(topic);
+}
+
 char *NetworkManager::httpGetString(char *url)
 {
   return nullptr;

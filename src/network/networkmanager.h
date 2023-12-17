@@ -21,6 +21,9 @@ public:
   void ensureMqttIsConnected();
   const struct timeval fetchGSMTime();
   void receiveMqttEvents();
+  void setMqttCallback(std::function<void (char*,uint8_t*,unsigned int)> cb);
+  bool mqttSubscribe(const char *topic, uint8_t qos);
+  bool mqttUnsubscribe(const char* topic);
 private:
   TinyGsm* modem;
   TinyGsmClient* client;
