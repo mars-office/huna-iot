@@ -41,7 +41,7 @@ void setup()
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
   netMan->setMqttCallback(mqttCallback);
-  //netMan->ensureMqttIsConnected();
+  // netMan->ensureMqttIsConnected();
   delay(500);
   // if (!netMan->mqttSubscribe("gigel", 0)) {
   //   Serial.println("Could not subscribe to topic");
@@ -53,8 +53,8 @@ void loop()
 {
   netMan->ensureRegistrationOnNetwork();
   netMan->ensureGprsIsConnected();
-  netMan->ensureMqttIsConnected();
+  //netMan->ensureMqttIsConnected();
   Serial.println("Hello!");
-  netMan->receiveMqttEvents();
+  //netMan->receiveMqttEvents();
   delay(1000);
 }
