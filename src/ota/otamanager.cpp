@@ -33,5 +33,5 @@ void OtaManager::updateIfNecessary()
     fwFile.write(data);
   });
   fwFile.close();
-  Serial.print("[OtaManager] Downloaded firmware.bin");
+  Serial.println("[OtaManager] Downloaded firmware.bin");
 }
