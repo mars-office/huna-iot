@@ -133,13 +133,15 @@ char *NetworkManager::otaGetServerVersion()
   return statusCode == 200 ? body : nullptr;
 }
 
-void NetworkManager::otaGetLatestFirmwareBin(std::function<void (uint8_t)> callback)
+void NetworkManager::otaGetLatestFirmwareBin(std::function<void (uint8_t*)> callback)
 {
   this->httpClient->connect(this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
   this->httpClient->get("/api/ota/update");
   int statusCode = this->httpClient->responseStatusCode();
+  uint8_t buffer[1024];
   while (this->httpClient->available()) {
-    callback((uint8_t)this->httpClient->read());
+    this->httpClient->readBytes(buffer, 1024);
+    callback(buffer);
   }
   this->httpClient->stop();
 }

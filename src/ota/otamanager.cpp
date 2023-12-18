@@ -29,8 +29,8 @@ void OtaManager::updateIfNecessary()
   Serial.println(VERSION);
   this->fileMan->deleteFileIfExists("/ota/firmware.bin");
   File fwFile = this->fileMan->openForWrite("/ota/firmware.bin");
-  this->netMan->otaGetLatestFirmwareBin([&fwFile](uint8_t data) {
-    fwFile.write(data);
+  this->netMan->otaGetLatestFirmwareBin([&fwFile](uint8_t* data) {
+    fwFile.write(data, 1024);
   });
   fwFile.close();
   Serial.println("[OtaManager] Downloaded firmware.bin");
