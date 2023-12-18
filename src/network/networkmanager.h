@@ -29,5 +29,4 @@ private:
   PubSubClient* mqtt;
   Config* config;
   SSLClientESP32* sslClient;
-  SSLClientESP32* sslClient2;
 };

@@ -19,18 +19,12 @@ NetworkManager::NetworkManager(Config *config)
   this->sslClient->setCertificate(this->config->getClientCertificate());
   this->mqtt = new PubSubClient(*this->sslClient);
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
-
-  this->sslClient2 = new SSLClientESP32(this->tinyGsmClient);
-  this->sslClient2->setCACert(this->config->getCaCertificate());
-  this->sslClient2->setPrivateKey(this->config->getClientKey());
-  this->sslClient2->setCertificate(this->config->getClientCertificate());
 }
 
 NetworkManager::~NetworkManager()
 {
   delete this->mqtt;
   delete this->sslClient;
-  delete this->sslClient2;
   delete this->tinyGsmClient;
   delete this->modem;
 }
@@ -133,29 +127,29 @@ bool NetworkManager::mqttUnsubscribe(const char *topic)
 
 void NetworkManager::httpGetString(const char *host, uint16_t port, const char *resource)
 {
-  if (this->sslClient2->connect(host, port))
+  if (this->sslClient->connect(host, port))
   {
-    this->sslClient2->printf("GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\n",
+    this->sslClient->printf("GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\n",
                             resource == nullptr ? "/" : resource,
                             host);
 
     // Wait a little to receive some data
     uint32_t start = millis();
-    while (this->sslClient2->connected() && !this->sslClient2->available() && ((millis() - start) < 10000L))
+    while (this->sslClient->connected() && !this->sslClient->available() && ((millis() - start) < 10000L))
     {
       delay(10);
     }
 
     log_d("Server response:");
 
-    while (this->sslClient2->available())
+    while (this->sslClient->available())
     {
-      char c = this->sslClient2->read();
+      char c = this->sslClient->read();
       Serial.print(c);
     }
 
     Serial.println();
 
-    this->sslClient2->stop();
+    this->sslClient->stop();
   }
 }
