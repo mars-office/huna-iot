@@ -120,14 +120,15 @@ bool NetworkManager::mqttUnsubscribe(const char *topic)
   return this->mqtt->unsubscribe(topic);
 }
 
-char* NetworkManager::otaGetServerVersion()
+char *NetworkManager::otaGetServerVersion()
 {
   this->httpClient->connect(this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
   this->httpClient->get("/api/ota/version");
   int statusCode = this->httpClient->responseStatusCode();
-  const char* bodyStr = this->httpClient->responseBody().c_str();
-  char* body = new char[strlen(bodyStr) + 1];
-  strcpy(body, bodyStr);
+  String rb = String(this->httpClient->responseBody());
+  rb.trim();
+  const char *bodyStr = rb.c_str();
+  char *body = strdup(bodyStr);
   this->httpClient->stop();
   return statusCode == 200 ? body : nullptr;
 }
