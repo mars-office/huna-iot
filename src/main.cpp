@@ -40,9 +40,6 @@ void setup()
   const struct timeval tv = netMan->fetchGSMTime();
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
-
-  char* r = netMan->otaGetServerVersion();
-  Serial.println(r);
   
   netMan->setMqttCallback(mqttCallback);
   netMan->ensureMqttIsConnected();
