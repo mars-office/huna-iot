@@ -1,7 +1,6 @@
 #include "filemanager.h"
 #include <SPIFFS.h>
 
-
 FileManager::FileManager()
 {
   if (!SPIFFS.begin()) {
@@ -22,4 +21,11 @@ const char* FileManager::readFile(const char *fileName)
   file.close();
   const char* dup = strdup(stringValue.c_str());
   return dup;
+}
+
+void FileManager::deleteFileIfExists(const char *fileName)
+{
+  if (SPIFFS.exists(fileName)) {
+    SPIFFS.remove(fileName);
+  }
 }

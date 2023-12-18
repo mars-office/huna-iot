@@ -132,3 +132,13 @@ char *NetworkManager::otaGetServerVersion()
   this->httpClient->stop();
   return statusCode == 200 ? body : nullptr;
 }
+
+char* NetworkManager::otaGetLatestFirmwareBin()
+{
+  this->httpClient->connect(this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
+  this->httpClient->get("/api/ota/update");
+  int statusCode = this->httpClient->responseStatusCode();
+  
+  this->httpClient->stop();
+  return statusCode == 200 ? nullptr : nullptr;
+}
