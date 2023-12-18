@@ -41,6 +41,7 @@ void setup()
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
   
+
   netMan->setMqttCallback(mqttCallback);
   netMan->ensureMqttIsConnected();
   delay(500);
