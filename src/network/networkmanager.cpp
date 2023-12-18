@@ -21,6 +21,7 @@ NetworkManager::NetworkManager(Config *config)
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
 
   this->httpClient = new HttpClient(*this->sslClient, String(this->config->getDetectionServer()), (uint16_t)this->config->getDetectionServerPort());
+  this->httpClient->connectionKeepAlive();
 }
 
 NetworkManager::~NetworkManager()
@@ -134,8 +135,10 @@ char *NetworkManager::httpGetString(bool useOtaServer, const char *url)
   if (this->httpClient->connect(useOtaServer ? this->config->getOtaServer() : this->config->getDetectionServer(),
                       useOtaServer ? this->config->getOtaServerPort() : this->config->getDetectionServerPort()))
   {
-    if (this->httpClient->get(url) == 0 && this->httpClient->responseStatusCode() == 200)
+    if (this->httpClient->get(url) == 0)
     {
+      Serial.println("1");
+      Serial.println(this->httpClient->responseStatusCode());
       const char *response = this->httpClient->responseBody().c_str();
       result = new char[strlen(response) + 1];
       strcpy(result, response);
