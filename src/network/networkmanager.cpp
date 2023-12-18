@@ -20,15 +20,17 @@ NetworkManager::NetworkManager(Config *config)
   this->mqtt = new PubSubClient(*this->sslClient);
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
 
-  this->httpClient = new HttpClient(*this->sslClient, String(this->config->getDetectionServer()), (uint16_t)this->config->getDetectionServerPort());
-  this->httpClient->connectionKeepAlive();
+  this->sslClient2 = new SSLClientESP32(this->tinyGsmClient);
+  this->sslClient2->setCACert(this->config->getCaCertificate());
+  this->sslClient2->setPrivateKey(this->config->getClientKey());
+  this->sslClient2->setCertificate(this->config->getClientCertificate());
 }
 
 NetworkManager::~NetworkManager()
 {
   delete this->mqtt;
-  delete this->httpClient;
   delete this->sslClient;
+  delete this->sslClient2;
   delete this->tinyGsmClient;
   delete this->modem;
 }
@@ -129,28 +131,31 @@ bool NetworkManager::mqttUnsubscribe(const char *topic)
   return this->mqtt->unsubscribe(topic);
 }
 
-char *NetworkManager::httpGetString(bool useOtaServer, const char *url)
+void NetworkManager::httpGetString(const char *host, uint16_t port, const char *resource)
 {
-  char *result = nullptr;
-  if (this->httpClient->connect(useOtaServer ? this->config->getOtaServer() : this->config->getDetectionServer(),
-                                useOtaServer ? this->config->getOtaServerPort() : this->config->getDetectionServerPort()))
+  if (this->sslClient2->connect(host, port))
   {
-    if (this->httpClient->get(url) == 0)
+    this->sslClient2->printf("GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\n",
+                            resource == nullptr ? "/" : resource,
+                            host);
+
+    // Wait a little to receive some data
+    uint32_t start = millis();
+    while (this->sslClient2->connected() && !this->sslClient2->available() && ((millis() - start) < 10000L))
     {
-      if (this->httpClient->responseStatusCode() < 200 || this->httpClient->responseStatusCode() >= 400)
-      {
-        Serial.println("[NetworkManager] Response had error status code");
-        Serial.println(this->httpClient->responseStatusCode());
-      }
-      const char *response = this->httpClient->responseBody().c_str();
-      result = new char[strlen(response) + 1];
-      strcpy(result, response);
+      delay(10);
     }
-    else
+
+    log_d("Server response:");
+
+    while (this->sslClient2->available())
     {
-      Serial.println("[NetworkManager] Request did not go out");
+      char c = this->sslClient2->read();
+      Serial.print(c);
     }
-    this->httpClient->stop();
+
+    Serial.println();
+
+    this->sslClient2->stop();
   }
-  return result;
 }

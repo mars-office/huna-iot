@@ -7,7 +7,7 @@
 #include <PubSubClient.h>
 #include "SSLClientESP32.h"
 #include "../config/config.h"
-#include <ArduinoHttpClient.h>
+
 class NetworkManager
 {
 public:
@@ -22,12 +22,12 @@ public:
   void setMqttCallback(std::function<void (char*,uint8_t*,unsigned int)> cb);
   bool mqttSubscribe(const char *topic, uint8_t qos);
   bool mqttUnsubscribe(const char* topic);
-  char* httpGetString(bool useOtaServer, const char* url);
+  void httpGetString(const char* host, uint16_t port, const char* resource);
 private:
   TinyGsm* modem;
   TinyGsmClient* tinyGsmClient;
   PubSubClient* mqtt;
   Config* config;
   SSLClientESP32* sslClient;
-  HttpClient* httpClient;
+  SSLClientESP32* sslClient2;
 };

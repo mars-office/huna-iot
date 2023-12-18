@@ -41,7 +41,8 @@ void setup()
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
 
-  Serial.println(netMan->httpGetString(true, "/api/ota/version"));
+  netMan->httpGetString(config->getOtaServer(), config->getOtaServerPort(), "/api/ota/version");
+  
   netMan->setMqttCallback(mqttCallback);
   netMan->ensureMqttIsConnected();
   delay(500);
