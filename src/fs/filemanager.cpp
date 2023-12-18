@@ -1,5 +1,4 @@
 #include "filemanager.h"
-#include <SPIFFS.h>
 
 FileManager::FileManager()
 {
@@ -28,4 +27,9 @@ void FileManager::deleteFileIfExists(const char *fileName)
   if (SPIFFS.exists(fileName)) {
     SPIFFS.remove(fileName);
   }
+}
+
+File FileManager::openForWrite(const char *fileName)
+{
+  return SPIFFS.open(fileName, "w", true);
 }

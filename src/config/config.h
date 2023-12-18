@@ -1,6 +1,8 @@
+#include "../fs/filemanager.h"
+
 class Config {
 public:
-    Config();
+    Config(FileManager* fm);
     ~Config();
 
     void init();
@@ -15,6 +17,7 @@ public:
     int getOtaServerPort();
     int getDetectionServerPort();
 private:
+    FileManager* fileMan;
     char* detectionServer;
     char* otaServer;
     int otaServerPort;

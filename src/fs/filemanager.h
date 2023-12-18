@@ -1,3 +1,5 @@
+#include <SPIFFS.h>
+
 class FileManager {
 public:
     FileManager();
@@ -5,7 +7,5 @@ public:
 
     const char* readFile(const char* fileName);
     void deleteFileIfExists(const char* fileName);
-
-private:
-    const char* pem;
+    File openForWrite(const char* fileName);
 };

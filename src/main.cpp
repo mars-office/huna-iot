@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include "version.h"
-#include "network/networkmanager.h"
+#include "ota/otamanager.h"
 #include <time.h>
 
+FileManager* fileMan;
 Config *config;
 NetworkManager *netMan;
 struct timeval *gsmTime;
+OtaManager* ota;
 
 void mqttCallback(char *topic, byte *payload, unsigned int length)
 {
@@ -21,7 +23,8 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
 
 void setup()
 {
-  config = new Config();
+  fileMan = new FileManager();
+  config = new Config(fileMan);
   Serial.begin(115200);
   delay(10);
   Serial.print("Version:");
@@ -34,13 +37,16 @@ void setup()
   Serial.print("Detection Server URL:");
   Serial.println(config->getDetectionServer());
   netMan = new NetworkManager(config);
+  ota = new OtaManager(fileMan, netMan);
   netMan->init();
   netMan->ensureRegistrationOnNetwork();
   netMan->ensureGprsIsConnected();
+  
   const struct timeval tv = netMan->fetchGSMTime();
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
   
+  ota->updateIfNecessary();
 
   netMan->setMqttCallback(mqttCallback);
   netMan->ensureMqttIsConnected();

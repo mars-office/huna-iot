@@ -1,14 +1,14 @@
 #include "config.h"
-#include "../fs/filemanager.h"
 #include <ArduinoJson.h>
 
-Config::Config()
+Config::Config(FileManager* fm)
 {
-
+  this->fileMan = fm;
 }
 
 Config::~Config()
 {
+  delete this->fileMan;
   delete[] this->caCertificate;
   delete[] this->clientCertificate;
   delete[] this->clientKey;
@@ -20,10 +20,9 @@ Config::~Config()
 
 void Config::init()
 {
-  FileManager* fileManager = new FileManager();
-  const char* clientCertificate = fileManager->readFile("/client.crt");
-  const char* clientKey = fileManager->readFile("/client.key");
-  const char* caCertificate = fileManager->readFile("/ca.crt");
+  const char* clientCertificate = this->fileMan->readFile("/client.crt");
+  const char* clientKey = this->fileMan->readFile("/client.key");
+  const char* caCertificate = this->fileMan->readFile("/ca.crt");
   this->clientCertificate = new char[strlen(clientCertificate) + 1];
   this->clientKey = new char[strlen(clientKey) + 1];
   this->caCertificate = new char[strlen(caCertificate) + 1];
@@ -31,8 +30,7 @@ void Config::init()
   strcpy(this->clientKey, clientKey);
   strcpy(this->caCertificate, caCertificate);
 
-  const char* config = fileManager->readFile("/config.json");
-  delete fileManager;
+  const char* config = this->fileMan->readFile("/config.json");
 
   StaticJsonDocument<384> doc;
   deserializeJson(doc, config);
