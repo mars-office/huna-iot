@@ -20,7 +20,7 @@ void OtaManager::updateIfNecessary()
   char* serverVersion = this->netMan->otaGetServerVersion();
   Serial.print("[OtaManager] Server version: ");
   Serial.println(serverVersion);
-  if (strcmp(serverVersion, VERSION)) {
+  if (!strcmp(serverVersion, VERSION)) {
     Serial.print("[OtaManager] No update needed, already running ");
     Serial.println(VERSION);
     return;
