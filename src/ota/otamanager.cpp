@@ -37,13 +37,19 @@ void OtaManager::updateIfNecessary()
   Serial.println("[OtaManager] Started flashing...");
   File rFile = this->fileMan->openForRead("/ota/firmware.bin");
   if (Update.begin(rFile.size())) {
-    uint8_t buffer[1024];
-    while (rFile.available()) {
-      rFile.read(buffer, 1024);
-      Update.write(buffer, 1024);
+    Serial.println("[OtaManager] Update is allowed, there is space");
+    Serial.println("[OtaManager] Flashing...");
+    Update.writeStream(rFile);
+    Serial.println("[OtaManager] Flashing done.");
+    if (Update.end()) {
+      Serial.println("[OtaManager] Successful update. Rebooting...");
+      rFile.close();
+      this->fileMan->deleteFileIfExists("/ota/firmware.bin");
+      ESP.restart();
+    } else {
+      Serial.println("[OtaManager] Update failed.");
+      rFile.close();
+      this->fileMan->deleteFileIfExists("/ota/firmware.bin");
     }
-    rFile.close();
-    this->fileMan->deleteFileIfExists("/ota/firmware.bin");
-    Update.end();
   }
 }
