@@ -19,8 +19,6 @@ NetworkManager::NetworkManager(Config *config)
   this->sslClient->setCertificate(this->config->getClientCertificate());
   this->mqtt = new PubSubClient(*this->sslClient);
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
-
-  
 }
 
 NetworkManager::~NetworkManager()
