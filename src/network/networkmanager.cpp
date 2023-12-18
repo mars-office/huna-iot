@@ -1,17 +1,8 @@
 #include "networkmanager.h"
-#ifdef DUMP_AT_COMMANDS
-#include <StreamDebugger.h>
-#endif
-
 NetworkManager::NetworkManager(Config *config)
 {
   this->config = config;
-#ifdef DUMP_AT_COMMANDS
-  StreamDebugger *debugger = new StreamDebugger(Serial2, Serial);
-  this->modem = new TinyGsm(*debugger);
-#else
   this->modem = new TinyGsm(Serial2);
-#endif
   this->tinyGsmClient = new TinyGsmClient(*this->modem, 0U);
   this->sslClient = new SSLClientESP32(this->tinyGsmClient);
   this->sslClient->setCACert(this->config->getCaCertificate());
