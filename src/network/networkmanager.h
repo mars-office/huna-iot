@@ -1,6 +1,6 @@
 #define TINY_GSM_MODEM_SIM800
 // #define DUMP_AT_COMMANDS
-// #define TINY_GSM_RX_BUFFER 1024 
+// #define TINY_GSM_RX_BUFFER 1024
 
 #include <TinyGsmClient.h>
 #include <HardwareSerial.h>
@@ -8,7 +8,6 @@
 #include "SSLClientESP32.h"
 #include "../config/config.h"
 #include <ArduinoHttpClient.h>
-
 class NetworkManager
 {
 public:
