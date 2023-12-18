@@ -10,11 +10,15 @@ NetworkManager::NetworkManager(Config *config)
   this->sslClient->setCertificate(this->config->getClientCertificate());
   this->mqtt = new PubSubClient(*this->sslClient);
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
+
+  this->httpClient = new HttpClient(*this->sslClient, this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
+  this->httpClient->connectionKeepAlive();
 }
 
 NetworkManager::~NetworkManager()
 {
   delete this->mqtt;
+  delete this->httpClient;
   delete this->sslClient;
   delete this->tinyGsmClient;
   delete this->modem;
@@ -116,31 +120,14 @@ bool NetworkManager::mqttUnsubscribe(const char *topic)
   return this->mqtt->unsubscribe(topic);
 }
 
-void NetworkManager::httpGetString(const char *host, uint16_t port, const char *resource)
+char* NetworkManager::otaGetServerVersion()
 {
-  if (this->sslClient->connect(host, port))
-  {
-    this->sslClient->printf("GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\n",
-                            resource == nullptr ? "/" : resource,
-                            host);
-
-    // Wait a little to receive some data
-    uint32_t start = millis();
-    while (this->sslClient->connected() && !this->sslClient->available() && ((millis() - start) < 10000L))
-    {
-      delay(10);
-    }
-
-    log_d("Server response:");
-
-    while (this->sslClient->available())
-    {
-      char c = this->sslClient->read();
-      Serial.print(c);
-    }
-
-    Serial.println();
-
-    this->sslClient->stop();
-  }
+  this->httpClient->connect(this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
+  this->httpClient->get("/api/ota/version");
+  int statusCode = this->httpClient->responseStatusCode();
+  const char* bodyStr = this->httpClient->responseBody().c_str();
+  char* body = new char[strlen(bodyStr) + 1];
+  strcpy(body, bodyStr);
+  this->httpClient->stop();
+  return statusCode == 200 ? body : nullptr;
 }
