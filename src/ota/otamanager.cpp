@@ -17,10 +17,11 @@ OtaManager::~OtaManager()
 void OtaManager::updateIfNecessary()
 {
   Serial.println("[OtaManager] Checking for server update...");
-  char* serverVersion = this->netMan->otaGetServerVersion();
+  char *serverVersion = this->netMan->otaGetServerVersion();
   Serial.print("[OtaManager] Server version: ");
   Serial.println(serverVersion);
-  if (!strcmp(serverVersion, VERSION)) {
+  if (!strcmp(serverVersion, VERSION))
+  {
     Serial.print("[OtaManager] No update needed, already running ");
     Serial.println(VERSION);
     return;
@@ -29,27 +30,38 @@ void OtaManager::updateIfNecessary()
   Serial.println(serverVersion);
   this->fileMan->deleteFileIfExists("/ota/firmware.bin");
   File fwFile = this->fileMan->openForWrite("/ota/firmware.bin");
-  this->netMan->otaGetLatestFirmwareBin([&fwFile](uint8_t* data) {
-    fwFile.write(data, 1024);
-  });
+  this->netMan->otaGetLatestFirmwareBin([&fwFile](uint8_t *data)
+                                        { fwFile.write(data, 1024); });
   fwFile.close();
   Serial.println("[OtaManager] Downloaded firmware.bin");
   Serial.println("[OtaManager] Started flashing...");
   File rFile = this->fileMan->openForRead("/ota/firmware.bin");
-  if (Update.begin(rFile.size())) {
-    Serial.println("[OtaManager] Update is allowed, there is space");
-    Serial.println("[OtaManager] Flashing...");
-    Update.writeStream(rFile);
-    Serial.println("[OtaManager] Flashing done.");
-    if (Update.end()) {
-      Serial.println("[OtaManager] Successful update. Rebooting...");
-      rFile.close();
-      this->fileMan->deleteFileIfExists("/ota/firmware.bin");
-      ESP.restart();
-    } else {
-      Serial.println("[OtaManager] Update failed.");
-      rFile.close();
-      this->fileMan->deleteFileIfExists("/ota/firmware.bin");
-    }
+  if (!Update.begin(rFile.size()))
+  {
+    Serial.println("[OtaManager] Update is not allowed.");
+    Serial.println(Update.errorString());
+    Serial.println(Update.getError());
+    rFile.close();
+    return;
+  }
+  Serial.println("[OtaManager] Update is allowed, there is space");
+  Serial.println("[OtaManager] Uploading...");
+  Update.writeStream(rFile);
+  Serial.println("[OtaManager] Upload done.");
+  if (Update.end())
+  {
+    Serial.println("[OtaManager] Successful update. Rebooting...");
+    rFile.close();
+    this->fileMan->deleteFileIfExists("/ota/firmware.bin");
+    delay(4000);
+    ESP.restart();
+  }
+  else
+  {
+    Serial.println("[OtaManager] Update failed.");
+    Serial.println(Update.getError());
+    Serial.println(Update.errorString());
+    rFile.close();
+    this->fileMan->deleteFileIfExists("/ota/firmware.bin");
   }
 }
