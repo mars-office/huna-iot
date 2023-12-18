@@ -39,6 +39,7 @@ void OtaManager::updateIfNecessary()
   if (Update.begin(rFile.size())) {
     uint8_t buffer[1024];
     while (rFile.available()) {
+      rFile.read(buffer, 1024);
       Update.write(buffer, 1024);
     }
     rFile.close();
