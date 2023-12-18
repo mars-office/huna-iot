@@ -34,4 +34,15 @@ void OtaManager::updateIfNecessary()
   });
   fwFile.close();
   Serial.println("[OtaManager] Downloaded firmware.bin");
+  Serial.println("[OtaManager] Started flashing...");
+  File rFile = this->fileMan->openForRead("/ota/firmware.bin");
+  if (Update.begin(rFile.size())) {
+    uint8_t buffer[1024];
+    while (rFile.available()) {
+      Update.write(buffer, 1024);
+    }
+    rFile.close();
+    this->fileMan->deleteFileIfExists("/ota/firmware.bin");
+    Update.end();
+  }
 }

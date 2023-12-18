@@ -8,4 +8,5 @@ public:
     const char* readFile(const char* fileName);
     void deleteFileIfExists(const char* fileName);
     File openForWrite(const char* fileName);
+    File openForRead(const char* fileName);
 };

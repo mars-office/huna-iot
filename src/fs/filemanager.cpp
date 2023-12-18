@@ -33,3 +33,8 @@ File FileManager::openForWrite(const char *fileName)
 {
   return SPIFFS.open(fileName, "w", true);
 }
+
+File FileManager::openForRead(const char *fileName)
+{
+  return SPIFFS.open(fileName, "r");
+}
