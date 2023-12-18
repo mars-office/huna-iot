@@ -133,15 +133,23 @@ char *NetworkManager::httpGetString(bool useOtaServer, const char *url)
 {
   char *result = nullptr;
   if (this->httpClient->connect(useOtaServer ? this->config->getOtaServer() : this->config->getDetectionServer(),
-                      useOtaServer ? this->config->getOtaServerPort() : this->config->getDetectionServerPort()))
+                                useOtaServer ? this->config->getOtaServerPort() : this->config->getDetectionServerPort()))
   {
     if (this->httpClient->get(url) == 0)
     {
-      Serial.println("1");
-      Serial.println(this->httpClient->responseStatusCode());
       const char *response = this->httpClient->responseBody().c_str();
       result = new char[strlen(response) + 1];
       strcpy(result, response);
+
+      if (this->httpClient->responseStatusCode() < 200 || this->httpClient->responseStatusCode() >= 400)
+      {
+        Serial.println("[NetworkManager] Response had error status code");
+        Serial.println(this->httpClient->responseStatusCode());
+      }
+    }
+    else
+    {
+      Serial.println("[NetworkManager] Request did not go out");
     }
     this->httpClient->stop();
   }
