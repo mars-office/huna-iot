@@ -36,9 +36,9 @@ void OtaManager::updateIfNecessary()
   this->fileMan->deleteFileIfExists("/ota/firmware.bin");
   File fwFile = this->fileMan->openForWrite("/ota/firmware.bin");
   int downloaded = 0;
-  this->netMan->otaGetLatestFirmwareBin([&fwFile, &downloaded](uint8_t *data)
+  this->netMan->otaGetLatestFirmwareBin([&fwFile, &downloaded](uint8_t *data, size_t readBytesCount)
                                         { 
-                                          int written = (int)(fwFile.write(data, 1024));
+                                          int written = (int)(fwFile.write(data, readBytesCount));
                                           downloaded += written;
                                           Serial.print("[OtaManager] Downloaded ");
                                           Serial.print(downloaded);
@@ -62,9 +62,8 @@ void OtaManager::updateIfNecessary()
   int flashed = 0;
   while (rFile.available())
   {
-    rFile.read(buff, 1024);
-    Serial.println((char *)buff);
-    int written = (int)(Update.write(buff, 1024));
+    size_t read = rFile.read(buff, 1024);
+    int written = (int)(Update.write(buff, read));
     flashed += written;
     Serial.print("[OtaManager] Flashed ");
     Serial.print(flashed);

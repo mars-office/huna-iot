@@ -22,7 +22,7 @@ public:
   bool mqttSubscribe(const char *topic, uint8_t qos);
   bool mqttUnsubscribe(const char* topic);
   char* otaGetServerVersion();
-  void otaGetLatestFirmwareBin(std::function<void (uint8_t*)> callback);
+  void otaGetLatestFirmwareBin(std::function<void (uint8_t*, size_t)> callback);
 private:
   TinyGsm* modem;
   TinyGsmClient* tinyGsmClient;
