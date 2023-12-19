@@ -20,6 +20,11 @@ void OtaManager::updateIfNecessary()
   char *serverVersion = this->netMan->otaGetServerVersion();
   Serial.print("[OtaManager] Server version: ");
   Serial.println(serverVersion);
+  if (serverVersion == nullptr)
+  {
+    Serial.println("[OtaManager] Cannot get latest version from server");
+    return;
+  }
   if (!strcmp(serverVersion, VERSION))
   {
     Serial.print("[OtaManager] No update needed, already running ");
@@ -49,9 +54,10 @@ void OtaManager::updateIfNecessary()
   Serial.println("[OtaManager] Uploading...");
   uint8_t buff[1024];
   int flashed = 0;
-  while (rFile.available()) {
+  while (rFile.available())
+  {
     rFile.read(buff, 1024);
-    Serial.println((char*)buff);
+    Serial.println((char *)buff);
     int written = (int)(Update.write(buff, 1024));
     flashed += written;
     Serial.print("[OtaManager] Flashed ");
