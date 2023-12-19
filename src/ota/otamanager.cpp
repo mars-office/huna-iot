@@ -58,19 +58,7 @@ void OtaManager::updateIfNecessary()
   }
   Serial.println("[OtaManager] Update is allowed, there is space");
   Serial.println("[OtaManager] Uploading...");
-  uint8_t buff[1024];
-  int flashed = 0;
-  while (rFile.available())
-  {
-    size_t read = rFile.read(buff, 1024);
-    int written = (int)(Update.write(buff, read));
-    flashed += written;
-    Serial.print("[OtaManager] Flashed ");
-    Serial.print(flashed);
-    Serial.print("/");
-    Serial.print(fileSize);
-    Serial.println();
-  }
+  Update.writeStream(rFile);
   Serial.println("[OtaManager] Upload done.");
   if (Update.end())
   {
