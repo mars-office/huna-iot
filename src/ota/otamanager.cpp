@@ -42,7 +42,7 @@ void OtaManager::updateIfNecessary()
                                           downloaded += written;
                                           Serial.print("[OtaManager] Downloaded ");
                                           Serial.print(downloaded);
-                                          Serial.print(" bits"); });
+                                          Serial.print(" bits"); Serial.println(); });
   fwFile.close();
   Serial.println("[OtaManager] Downloaded firmware.bin");
   Serial.println("[OtaManager] Started flashing...");
