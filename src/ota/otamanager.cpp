@@ -79,8 +79,11 @@ void OtaManager::updateIfNecessary()
     Serial.println("[OtaManager] Deleting temp file...");
     this->fileMan->deleteFileIfExists("/ota/firmware.bin");
     delay(4000);
-    Serial.println("[OtaManager] Successful update. Rebooting...");
-    ESP.restart();
+    if (Update.isFinished())
+    {
+      Serial.println("[OtaManager] Successful update. Rebooting...");
+      ESP.restart();
+    }
   }
   else
   {
