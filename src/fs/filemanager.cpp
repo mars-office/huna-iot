@@ -31,7 +31,7 @@ void FileManager::deleteFileIfExists(const char *fileName)
 
 File FileManager::openForWrite(const char *fileName)
 {
-  return SPIFFS.open(fileName, "w", true);
+  return SPIFFS.open(fileName, FILE_APPEND, true);
 }
 
 File FileManager::openForRead(const char *fileName)
