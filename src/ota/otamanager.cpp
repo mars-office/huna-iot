@@ -48,7 +48,7 @@ void OtaManager::updateIfNecessary()
   Serial.println("[OtaManager] Started flashing...");
   File rFile = this->fileMan->openForRead("/ota/firmware.bin");
   int fileSize = (int)rFile.size();
-  if (!Update.begin(fileSize))
+  if (!Update.begin(fileSize, U_FLASH))
   {
     Serial.println("[OtaManager] Update is not allowed.");
     Serial.println(Update.errorString());
