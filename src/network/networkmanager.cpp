@@ -138,6 +138,7 @@ void NetworkManager::otaGetLatestFirmwareBin(std::function<void (uint8_t*, size_
   this->httpClient->connect(this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
   this->httpClient->get("/api/ota/update");
   int statusCode = this->httpClient->responseStatusCode();
+  this->httpClient->skipResponseHeaders();
   uint8_t buffer[1024];
   while (this->httpClient->available()) {
     size_t readBytesCount = this->httpClient->readBytes(buffer, 1024);
