@@ -1,4 +1,8 @@
+#ifndef NetworkManager_h
+#define NetworkManager_h
+
 #define TINY_GSM_MODEM_SIM800
+#define MQTT_MAX_PACKET_SIZE 2048
 
 #include <TinyGsmClient.h>
 #include <HardwareSerial.h>
@@ -23,6 +27,12 @@ public:
   bool mqttUnsubscribe(const char* topic);
   char* otaGetServerVersion();
   void otaGetLatestFirmwareBin(std::function<void (uint8_t*, size_t)> callback);
+  bool publishMqttMessage(const char* topic, const char* data);
+  int getGsmSignal();
+  char* getSimSerial();
+  char* getOperator();
+  int getModemVoltage();
+  char* getModemImei();
 private:
   TinyGsm* modem;
   TinyGsmClient* tinyGsmClient;
@@ -31,3 +41,5 @@ private:
   SSLClientESP32* sslClient;
   HttpClient* httpClient;
 };
+
+#endif

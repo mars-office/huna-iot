@@ -1,15 +1,24 @@
 #include <Arduino.h>
 #include "version.h"
 #include "ota/otamanager.h"
+#include "config/config.h"
+#include "network/networkmanager.h"
+#include "fs/filemanager.h"
 #include <time.h>
+#include "version.h"
 #include "device/internalledmanager.h"
+#include "device/statusmonitor.h"
 
 FileManager* fileMan;
 Config *config;
 NetworkManager *netMan;
 struct timeval *gsmTime;
 OtaManager* ota;
+StatusMonitor* statusMonitor;
 InternalLedManager* internalLed;
+
+unsigned long lastStatusMillis = 0;
+const char* statusTopic;
 
 void mqttCallback(char *topic, byte *payload, unsigned int length)
 {
@@ -37,11 +46,15 @@ void setup()
   Serial.println("Setup started");
   Serial.println("Reading config...");
   config->init();
+  String topic = "devices/";
+  topic.concat(config->getId());
+  statusTopic = strdup(topic.c_str());
   Serial.print("ID:");
   Serial.println(config->getId());
   Serial.print("Detection Server URL:");
   Serial.println(config->getDetectionServer());
   netMan = new NetworkManager(config);
+  statusMonitor = new StatusMonitor(netMan, config);
   ota = new OtaManager(fileMan, netMan);
   netMan->init();
   netMan->ensureRegistrationOnNetwork();
@@ -72,6 +85,20 @@ void loop()
   netMan->ensureMqttIsConnected();
   Serial.println("Hello!");
   netMan->receiveMqttEvents();
+  
+  unsigned long currentMillis = millis();
+  if (currentMillis - lastStatusMillis >= 25000) {
+    lastStatusMillis = currentMillis;
+    Serial.println("Publishing status message...");
+    Serial.println(statusTopic);
+    Serial.println(statusMonitor->getStatusJson());
+    if (netMan->publishMqttMessage(statusTopic, statusMonitor->getStatusJson())) {
+      Serial.println("Published status message.");
+    } else {
+      Serial.println("Published status message failed.");
+    }
+  }
+
   internalLed->off();
   delay(1000);
 }

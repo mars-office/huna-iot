@@ -1,3 +1,5 @@
+#ifndef Config_h
+#define Config_h
 #include "../fs/filemanager.h"
 
 class Config {
@@ -29,3 +31,4 @@ private:
     char* mqttServer;
     int mqttPort;
 };
+#endif

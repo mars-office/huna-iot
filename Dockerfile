@@ -5,7 +5,9 @@ COPY ./platformio.ini ./platformio.ini
 RUN pio lib install
 COPY . .
 ARG DEPLOYABLE_VERSION
-RUN echo '#define VERSION "${DEPLOYABLE_VERSION}"' > ./src/version.h
+RUN echo '#ifndef VERSION' > ./src/version.h
+RUN echo '#define VERSION "${DEPLOYABLE_VERSION}"' >> ./src/version.h
+RUN echo '#endif' >> ./src/version.h
 RUN pio run
 RUN echo "${DEPLOYABLE_VERSION}" > ./.pio/build/esp32doit-devkit-v1/VERSION.txt
 

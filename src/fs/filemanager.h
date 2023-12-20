@@ -1,3 +1,5 @@
+#ifndef FileManager_h
+#define FileManager_h
 #include <SPIFFS.h>
 
 class FileManager {
@@ -10,3 +12,4 @@ public:
     File openForWrite(const char* fileName);
     File openForRead(const char* fileName);
 };
+#endif

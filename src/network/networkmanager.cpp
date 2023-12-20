@@ -144,3 +144,39 @@ void NetworkManager::otaGetLatestFirmwareBin(std::function<void (uint8_t*, size_
     callback(buffer, readBytesCount);
   }
 }
+
+bool NetworkManager::publishMqttMessage(const char *topic, const char *data)
+{
+  return this->mqtt->publish(topic, data);
+}
+
+int NetworkManager::getGsmSignal()
+{
+  return (int)this->modem->getSignalQuality();
+}
+
+char *NetworkManager::getSimSerial()
+{
+  String ccid = this->modem->getSimCCID();
+  const char* ccidChar = ccid.c_str();
+  return strdup(ccidChar);
+}
+
+char *NetworkManager::getOperator()
+{
+  String opr = this->modem->getOperator();
+  const char* oprChar = opr.c_str();
+  return strdup(oprChar);
+}
+
+int NetworkManager::getModemVoltage()
+{
+  return (int)this->modem->getBattVoltage();
+}
+
+char *NetworkManager::getModemImei()
+{
+  String imei = this->modem->getIMEI();
+  const char* imeiChar = imei.c_str();
+  return strdup(imeiChar);
+}

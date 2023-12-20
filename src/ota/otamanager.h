@@ -1,4 +1,7 @@
+#ifndef OtaManager_h
+#define OtaManager_h
 #include "../network/networkmanager.h"
+#include "../fs/filemanager.h"
 
 class OtaManager {
 public:
@@ -10,3 +13,4 @@ private:
     NetworkManager* netMan;
     FileManager* fileMan;
 };
+#endif

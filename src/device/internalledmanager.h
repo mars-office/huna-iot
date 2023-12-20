@@ -1,3 +1,5 @@
+#ifndef InternalLedManager_h
+#define InternalLedManager_h
 class InternalLedManager {
 public:
     InternalLedManager();
@@ -6,3 +8,4 @@ public:
     void on();
     void off();
 };
+#endif
