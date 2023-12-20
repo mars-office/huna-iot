@@ -2,12 +2,14 @@
 #include "version.h"
 #include "ota/otamanager.h"
 #include <time.h>
+#include "device/internalledmanager.h"
 
 FileManager* fileMan;
 Config *config;
 NetworkManager *netMan;
 struct timeval *gsmTime;
 OtaManager* ota;
+InternalLedManager* internalLed;
 
 void mqttCallback(char *topic, byte *payload, unsigned int length)
 {
@@ -23,6 +25,9 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
 
 void setup()
 {
+  internalLed = new InternalLedManager();
+  internalLed->init();
+  internalLed->on();
   fileMan = new FileManager();
   config = new Config(fileMan);
   Serial.begin(115200);
@@ -55,14 +60,18 @@ void setup()
   {
     Serial.println("Could not subscribe to topic");
   }
+  internalLed->off();
+  delay(500);
 }
 
 void loop()
 {
+  internalLed->on();
   netMan->ensureRegistrationOnNetwork();
   netMan->ensureGprsIsConnected();
   netMan->ensureMqttIsConnected();
   Serial.println("Hello!");
   netMan->receiveMqttEvents();
+  internalLed->off();
   delay(1000);
 }

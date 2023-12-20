@@ -129,7 +129,6 @@ char *NetworkManager::otaGetServerVersion()
   rb.trim();
   const char *bodyStr = rb.c_str();
   char *body = strdup(bodyStr);
-  this->httpClient->stop();
   return statusCode == 200 ? body : nullptr;
 }
 
@@ -144,5 +143,4 @@ void NetworkManager::otaGetLatestFirmwareBin(std::function<void (uint8_t*, size_
     size_t readBytesCount = this->httpClient->readBytes(buffer, 1024);
     callback(buffer, readBytesCount);
   }
-  this->httpClient->stop();
 }
