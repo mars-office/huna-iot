@@ -22,20 +22,6 @@ unsigned long lastOtaCheckMillis = 0;
 const char* statusTopic;
 const char* commandsTopic;
 
-void mqttCallback(char *topic, byte *payload, unsigned int length)
-{
-  String topicStr = String(topic);
-  String payloadStr = String(payload, length);
-  Serial.print("Message arrived [");
-  Serial.print(topicStr);
-  Serial.print("] ");
-  Serial.print(payloadStr);
-  Serial.println();
-  if (topicStr.startsWith("commands/")) {
-    handleCommand(payloadStr);
-    return;
-  }
-}
 
 void handleCommand(String payload) {
   payload.toLowerCase();
@@ -47,6 +33,22 @@ void handleCommand(String payload) {
   if (payload == "otacheck") {
     Serial.println("[Command] OTA Check...");
     ota->updateIfNecessary();
+    return;
+  }
+}
+
+
+void mqttCallback(char *topic, byte *payload, unsigned int length)
+{
+  String topicStr = String(topic);
+  String payloadStr = String(payload, length);
+  Serial.print("Message arrived [");
+  Serial.print(topicStr);
+  Serial.print("] ");
+  Serial.print(payloadStr);
+  Serial.println();
+  if (topicStr.startsWith("commands/")) {
+    handleCommand(payloadStr);
     return;
   }
 }
