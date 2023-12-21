@@ -35,7 +35,12 @@ void handleCommand(String payload) {
     ota->updateIfNecessary();
     return;
   }
-  
+  if (payload == "resetmodem") {
+    Serial.println("[Command] Reset modem...");
+    netMan->hardResetModem();
+    return;
+  }
+
   Serial.println("[Command] Unknown command");
 }
 

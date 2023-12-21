@@ -32,6 +32,8 @@ NetworkManager::~NetworkManager()
 
 void NetworkManager::init()
 {
+  pinMode(GPIO_NUM_4, OUTPUT);
+  digitalWrite(GPIO_NUM_4, LOW);
   Serial2.begin(115200);
   Serial.println("[NetworkManager] Initializing modem...");
   this->modem->init();
@@ -193,4 +195,11 @@ char *NetworkManager::getModemImei()
   String imei = this->modem->getIMEI();
   const char* imeiChar = imei.c_str();
   return strdup(imeiChar);
+}
+
+void NetworkManager::hardResetModem()
+{
+  digitalWrite(GPIO_NUM_4, HIGH);
+  delay(1005);
+  digitalWrite(GPIO_NUM_4, LOW);
 }

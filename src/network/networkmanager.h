@@ -32,6 +32,7 @@ public:
   char* getOperator();
   int getModemVoltage();
   char* getModemImei();
+  void hardResetModem();
 private:
   TinyGsm* modem;
   TinyGsmClient* tinyGsmClient;
