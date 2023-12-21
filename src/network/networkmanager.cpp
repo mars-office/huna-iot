@@ -33,7 +33,7 @@ NetworkManager::~NetworkManager()
 void NetworkManager::init()
 {
   pinMode(GPIO_NUM_4, OUTPUT);
-  digitalWrite(GPIO_NUM_4, LOW);
+  digitalWrite(GPIO_NUM_4, HIGH);
   Serial2.begin(115200);
   Serial.println("[NetworkManager] Initializing modem...");
   this->modem->init();
@@ -199,7 +199,7 @@ char *NetworkManager::getModemImei()
 
 void NetworkManager::hardResetModem()
 {
-  digitalWrite(GPIO_NUM_4, HIGH);
-  delay(1005);
   digitalWrite(GPIO_NUM_4, LOW);
+  delay(100);
+  digitalWrite(GPIO_NUM_4, HIGH);
 }
