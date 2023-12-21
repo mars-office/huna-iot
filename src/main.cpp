@@ -120,8 +120,6 @@ void loop()
   if (currentMillis - lastStatusMillis >= 25000) {
     lastStatusMillis = currentMillis;
     Serial.println("Publishing status message...");
-    Serial.println(statusTopic);
-    Serial.println(statusMonitor->getStatusJson());
     if (netMan->publishMqttMessage(statusTopic, statusMonitor->getStatusJson())) {
       Serial.println("Published status message.");
     } else {

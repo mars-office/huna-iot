@@ -40,7 +40,6 @@ private:
   Config* config;
   SSLClientESP32* sslClient;
   SSLClientESP32* sslClient2;
-  HttpClient* httpClient;
 };
 
 #endif

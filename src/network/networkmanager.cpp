@@ -12,20 +12,17 @@ NetworkManager::NetworkManager(Config *config)
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
   this->mqtt->setBufferSize(1024);
 
-
   this->tinyGsmClient2 = new TinyGsmClient(*this->modem, 1U);
   this->sslClient2 = new SSLClientESP32(this->tinyGsmClient2);
   this->sslClient2->setCACert(this->config->getCaCertificate());
   this->sslClient2->setPrivateKey(this->config->getClientKey());
   this->sslClient2->setCertificate(this->config->getClientCertificate());
-  this->httpClient = new HttpClient(*this->sslClient2, this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
-  this->httpClient->connectionKeepAlive();
+
 }
 
 NetworkManager::~NetworkManager()
 {
   delete this->mqtt;
-  delete this->httpClient;
   delete this->sslClient2;
   delete this->sslClient;
   delete this->tinyGsmClient;
@@ -131,27 +128,35 @@ bool NetworkManager::mqttUnsubscribe(const char *topic)
 
 char *NetworkManager::otaGetServerVersion()
 {
-  this->httpClient->connect(this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
-  this->httpClient->get("/api/ota/version");
-  int statusCode = this->httpClient->responseStatusCode();
-  String rb = String(this->httpClient->responseBody());
+  HttpClient* httpClient = new HttpClient(*this->sslClient2, this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
+  httpClient->connectionKeepAlive();
+  httpClient->connect(this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
+  httpClient->get("/api/ota/version");
+  int statusCode = httpClient->responseStatusCode();
+  String rb = String(httpClient->responseBody());
   rb.trim();
   const char *bodyStr = rb.c_str();
   char *body = strdup(bodyStr);
+  httpClient->stop();
+  delete httpClient;
   return statusCode == 200 ? body : nullptr;
 }
 
 void NetworkManager::otaGetLatestFirmwareBin(std::function<void (uint8_t*, size_t)> callback)
 {
-  this->httpClient->connect(this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
-  this->httpClient->get("/api/ota/update");
-  int statusCode = this->httpClient->responseStatusCode();
-  this->httpClient->skipResponseHeaders();
+  HttpClient* httpClient = new HttpClient(*this->sslClient2, this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
+  httpClient->connectionKeepAlive();
+  httpClient->connect(this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
+  httpClient->get("/api/ota/update");
+  int statusCode = httpClient->responseStatusCode();
+  httpClient->skipResponseHeaders();
   uint8_t buffer[1024];
-  while (this->httpClient->available()) {
-    size_t readBytesCount = this->httpClient->readBytes(buffer, 1024);
+  while (httpClient->available()) {
+    size_t readBytesCount = httpClient->readBytes(buffer, 1024);
     callback(buffer, readBytesCount);
   }
+  httpClient->stop();
+  delete httpClient;
 }
 
 bool NetworkManager::publishMqttMessage(const char *topic, const char *data)
