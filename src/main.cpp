@@ -35,6 +35,8 @@ void handleCommand(String payload) {
     ota->updateIfNecessary();
     return;
   }
+  
+  Serial.println("[Command] Unknown command");
 }
 
 
@@ -111,7 +113,6 @@ void loop()
   netMan->ensureRegistrationOnNetwork();
   netMan->ensureGprsIsConnected();
   netMan->ensureMqttIsConnected();
-  Serial.println("Hello!");
   netMan->receiveMqttEvents();
   
   unsigned long currentMillis = millis();
