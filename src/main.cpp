@@ -18,18 +18,37 @@ StatusMonitor* statusMonitor;
 InternalLedManager* internalLed;
 
 unsigned long lastStatusMillis = 0;
+unsigned long lastOtaCheckMillis = 0;
 const char* statusTopic;
+const char* commandsTopic;
 
 void mqttCallback(char *topic, byte *payload, unsigned int length)
 {
+  String topicStr = String(topic);
+  String payloadStr = String(payload, length);
   Serial.print("Message arrived [");
-  Serial.print(topic);
+  Serial.print(topicStr);
   Serial.print("] ");
-  for (int i = 0; i < length; i++)
-  {
-    Serial.print((char)payload[i]);
-  }
+  Serial.print(payloadStr);
   Serial.println();
+  if (topicStr.startsWith("commands/")) {
+    handleCommand(payloadStr);
+    return;
+  }
+}
+
+void handleCommand(String payload) {
+  payload.toLowerCase();
+  if (payload == "reboot") {
+    Serial.println("[Command] Rebooting...");
+    ESP.restart();
+    return;
+  }
+  if (payload == "otacheck") {
+    Serial.println("[Command] OTA Check...");
+    ota->updateIfNecessary();
+    return;
+  }
 }
 
 void setup()
@@ -46,9 +65,12 @@ void setup()
   Serial.println("Setup started");
   Serial.println("Reading config...");
   config->init();
-  String topic = "devices/";
-  topic.concat(config->getId());
-  statusTopic = strdup(topic.c_str());
+  String ststopic = "status/";
+  ststopic.concat(config->getId());
+  statusTopic = strdup(ststopic.c_str());
+  String cmdtopic = "commands/";
+  cmdtopic.concat(config->getId());
+  commandsTopic = strdup(cmdtopic.c_str());
   Serial.print("ID:");
   Serial.println(config->getId());
   Serial.print("Detection Server URL:");
@@ -67,11 +89,13 @@ void setup()
   netMan->setMqttCallback(mqttCallback);
   netMan->ensureMqttIsConnected();
   delay(500);
-  if (!netMan->mqttSubscribe("gigel", 0))
+  if (!netMan->mqttSubscribe(commandsTopic, 0))
   {
-    Serial.println("Could not subscribe to topic");
+    Serial.println("Could not subscribe to commands topic");
   }
-  
+  Serial.println("Sending initial status event...");
+  netMan->publishMqttMessage(statusTopic, statusMonitor->getStatusJson());
+  Serial.println("Initial status event sent.");
   delay(100);
   ota->updateIfNecessary();
 
@@ -89,7 +113,8 @@ void loop()
   netMan->receiveMqttEvents();
   
   unsigned long currentMillis = millis();
-  if (lastStatusMillis == 0 || currentMillis - lastStatusMillis >= 25000) {
+
+  if (currentMillis - lastStatusMillis >= 25000) {
     lastStatusMillis = currentMillis;
     Serial.println("Publishing status message...");
     Serial.println(statusTopic);
@@ -97,8 +122,14 @@ void loop()
     if (netMan->publishMqttMessage(statusTopic, statusMonitor->getStatusJson())) {
       Serial.println("Published status message.");
     } else {
-      Serial.println("Published status message failed.");
+      Serial.println("Publishing status message failed.");
     }
+  }
+
+  if (currentMillis - lastOtaCheckMillis >= 3600000L) {
+    Serial.println("Checking for OTA updates...");
+    lastOtaCheckMillis = currentMillis;
+    ota->updateIfNecessary();
   }
 
   internalLed->off();
