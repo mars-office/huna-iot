@@ -17,7 +17,6 @@ NetworkManager::NetworkManager(Config *config)
   this->sslClient2->setCACert(this->config->getCaCertificate());
   this->sslClient2->setPrivateKey(this->config->getClientKey());
   this->sslClient2->setCertificate(this->config->getClientCertificate());
-
 }
 
 NetworkManager::~NetworkManager()
@@ -32,8 +31,8 @@ NetworkManager::~NetworkManager()
 
 void NetworkManager::init()
 {
-  pinMode(GPIO_NUM_4, OUTPUT);
-  digitalWrite(GPIO_NUM_4, HIGH);
+  pinMode(GPIO_NUM_4, OUTPUT); // reset pin
+  digitalWrite(GPIO_NUM_4, HIGH); // default high, set to low for 100ms for reset, method for that is below hardResetModem()
   Serial2.begin(115200);
   Serial.println("[NetworkManager] Initializing modem...");
   this->modem->init();
@@ -43,16 +42,25 @@ void NetworkManager::init()
 
 void NetworkManager::ensureRegistrationOnNetwork()
 {
+  int minutes = 0;
   while (!this->modem->waitForNetwork())
   {
+    minutes++;
     Serial.println("[NetworkManager] No network, waiting 60s...");
+    if (minutes == 10)
+    {
+      minutes = 0;
+      this->hardResetModem();
+    }
   }
 }
 
 void NetworkManager::ensureGprsIsConnected()
 {
+  int passes = 0;
   while (!this->modem->isGprsConnected())
   {
+    passes++;
     Serial.println("[NetworkManager] GPRS not connected");
     Serial.println("[NetworkManager] GPRS connecting...");
     if (!this->modem->gprsConnect("net"))
@@ -65,14 +73,23 @@ void NetworkManager::ensureGprsIsConnected()
       break;
     }
     Serial.println("[NetworkManager] Waiting 5s");
+
+    if (passes == 120)
+    { // 10 minutes
+      passes = 0;
+      this->hardResetModem();
+    }
+
     delay(5000);
   }
 }
 
 void NetworkManager::ensureMqttIsConnected()
 {
+  int passes = 0;
   while (!this->mqtt->connected())
   {
+    passes++;
     Serial.println("[NetworkManager] MQTT not connected.");
     if (!this->mqtt->connect(this->config->getId()))
     {
@@ -82,6 +99,13 @@ void NetworkManager::ensureMqttIsConnected()
     else
     {
       Serial.println("[NetworkManager] MQTT connected.");
+      passes = 0;
+    }
+
+    if (passes == 120)
+    { // 10 minutes
+      passes = 0;
+      this->hardResetModem();
     }
   }
 }
@@ -130,7 +154,7 @@ bool NetworkManager::mqttUnsubscribe(const char *topic)
 
 char *NetworkManager::otaGetServerVersion()
 {
-  HttpClient* httpClient = new HttpClient(*this->sslClient2, this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
+  HttpClient *httpClient = new HttpClient(*this->sslClient2, this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
   httpClient->connectionKeepAlive();
   httpClient->connect(this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
   httpClient->get("/api/ota/version");
@@ -144,16 +168,17 @@ char *NetworkManager::otaGetServerVersion()
   return statusCode == 200 ? body : nullptr;
 }
 
-void NetworkManager::otaGetLatestFirmwareBin(std::function<void (uint8_t*, size_t)> callback)
+void NetworkManager::otaGetLatestFirmwareBin(std::function<void(uint8_t *, size_t)> callback)
 {
-  HttpClient* httpClient = new HttpClient(*this->sslClient2, this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
+  HttpClient *httpClient = new HttpClient(*this->sslClient2, this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
   httpClient->connectionKeepAlive();
   httpClient->connect(this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
   httpClient->get("/api/ota/update");
   int statusCode = httpClient->responseStatusCode();
   httpClient->skipResponseHeaders();
   uint8_t buffer[1024];
-  while (httpClient->available()) {
+  while (httpClient->available())
+  {
     size_t readBytesCount = httpClient->readBytes(buffer, 1024);
     callback(buffer, readBytesCount);
   }
@@ -174,14 +199,14 @@ int NetworkManager::getGsmSignal()
 char *NetworkManager::getSimSerial()
 {
   String ccid = this->modem->getSimCCID();
-  const char* ccidChar = ccid.c_str();
+  const char *ccidChar = ccid.c_str();
   return strdup(ccidChar);
 }
 
 char *NetworkManager::getOperator()
 {
   String opr = this->modem->getOperator();
-  const char* oprChar = opr.c_str();
+  const char *oprChar = opr.c_str();
   return strdup(oprChar);
 }
 
@@ -193,7 +218,7 @@ int NetworkManager::getModemVoltage()
 char *NetworkManager::getModemImei()
 {
   String imei = this->modem->getIMEI();
-  const char* imeiChar = imei.c_str();
+  const char *imeiChar = imei.c_str();
   return strdup(imeiChar);
 }
 
