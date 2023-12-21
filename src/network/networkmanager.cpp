@@ -10,8 +10,15 @@ NetworkManager::NetworkManager(Config *config)
   this->sslClient->setCertificate(this->config->getClientCertificate());
   this->mqtt = new PubSubClient(*this->sslClient);
   this->mqtt->setServer(this->config->getMqttServer(), this->config->getMqttPort());
+  this->mqtt->setBufferSize(1024);
 
-  this->httpClient = new HttpClient(*this->sslClient, this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
+
+  this->tinyGsmClient2 = new TinyGsmClient(*this->modem, 1U);
+  this->sslClient2 = new SSLClientESP32(this->tinyGsmClient2);
+  this->sslClient2->setCACert(this->config->getCaCertificate());
+  this->sslClient2->setPrivateKey(this->config->getClientKey());
+  this->sslClient2->setCertificate(this->config->getClientCertificate());
+  this->httpClient = new HttpClient(*this->sslClient2, this->config->getOtaServer(), (uint16_t)this->config->getOtaServerPort());
   this->httpClient->connectionKeepAlive();
 }
 
@@ -19,8 +26,10 @@ NetworkManager::~NetworkManager()
 {
   delete this->mqtt;
   delete this->httpClient;
+  delete this->sslClient2;
   delete this->sslClient;
   delete this->tinyGsmClient;
+  delete this->tinyGsmClient2;
   delete this->modem;
 }
 

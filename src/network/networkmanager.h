@@ -2,7 +2,6 @@
 #define NetworkManager_h
 
 #define TINY_GSM_MODEM_SIM800
-#define MQTT_MAX_PACKET_SIZE 2048
 
 #include <TinyGsmClient.h>
 #include <HardwareSerial.h>
@@ -36,9 +35,11 @@ public:
 private:
   TinyGsm* modem;
   TinyGsmClient* tinyGsmClient;
+  TinyGsmClient* tinyGsmClient2;
   PubSubClient* mqtt;
   Config* config;
   SSLClientESP32* sslClient;
+  SSLClientESP32* sslClient2;
   HttpClient* httpClient;
 };
 

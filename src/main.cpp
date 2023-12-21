@@ -63,8 +63,6 @@ void setup()
   const struct timeval tv = netMan->fetchGSMTime();
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
-  
-  ota->updateIfNecessary();
 
   netMan->setMqttCallback(mqttCallback);
   netMan->ensureMqttIsConnected();
@@ -73,6 +71,10 @@ void setup()
   {
     Serial.println("Could not subscribe to topic");
   }
+  
+  delay(100);
+  ota->updateIfNecessary();
+
   internalLed->off();
   delay(500);
 }
@@ -87,7 +89,7 @@ void loop()
   netMan->receiveMqttEvents();
   
   unsigned long currentMillis = millis();
-  if (currentMillis - lastStatusMillis >= 25000) {
+  if (lastStatusMillis == 0 || currentMillis - lastStatusMillis >= 25000) {
     lastStatusMillis = currentMillis;
     Serial.println("Publishing status message...");
     Serial.println(statusTopic);
