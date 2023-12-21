@@ -93,7 +93,7 @@ void setup()
   netMan->setMqttCallback(mqttCallback);
   netMan->ensureMqttIsConnected();
   delay(500);
-  if (!netMan->mqttSubscribe(commandsTopic, 0))
+  if (!netMan->mqttSubscribe(commandsTopic, 1))
   {
     Serial.println("Could not subscribe to commands topic");
   }
