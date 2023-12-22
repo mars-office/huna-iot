@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "huna-iot.fullname" . }}-{{ .Chart.AppVersion }}
+  name: {{ include "huna-iot.fullname" . }}-{{ .Chart.AppVersion | replace "." "-" }}
   labels:
     {{- include "huna-iot.labels" . | nindent 4 }}
 spec:
