@@ -1,6 +1,6 @@
 name: 'CI'
 
-run-name: '0.2.9 - ${{ github.workflow }}'
+run-name: '0.3.0 - ${{ github.workflow }}'
 
 on:
   workflow_dispatch:
@@ -23,5 +23,5 @@ jobs:
     uses: mars-office/.github/.github/workflows/ci.yaml@main
     secrets: inherit
     with:
-      version: '0.2.9'
+      version: '0.3.0'
       umbrellaChartName: 'huna'
