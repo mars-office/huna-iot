@@ -20,7 +20,6 @@ InternalLedManager* internalLed;
 unsigned long lastStatusMillis = 0;
 unsigned long lastOtaCheckMillis = 0;
 const char* statusTopic;
-const char* commandsTopic;
 
 
 void handleCommand(String payload) {
@@ -77,9 +76,6 @@ void setup()
   String ststopic = "status/";
   ststopic.concat(config->getId());
   statusTopic = strdup(ststopic.c_str());
-  String cmdtopic = "commands/";
-  cmdtopic.concat(config->getId());
-  commandsTopic = strdup(cmdtopic.c_str());
   Serial.print("ID:");
   Serial.println(config->getId());
   Serial.print("Detection Server URL:");
@@ -90,26 +86,16 @@ void setup()
   netMan->init();
   netMan->ensureRegistrationOnNetwork();
   netMan->ensureGprsIsConnected();
-  
   const struct timeval tv = netMan->fetchGSMTime();
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
-
   netMan->setMqttCallback(mqttCallback);
   netMan->ensureMqttIsConnected();
-  delay(500);
-  if (!netMan->mqttSubscribe(commandsTopic, 1))
-  {
-    Serial.println("Could not subscribe to commands topic");
-  }
   Serial.println("Sending initial status event...");
   netMan->publishMqttMessage(statusTopic, statusMonitor->getStatusJson());
   Serial.println("Initial status event sent.");
-  delay(100);
   ota->updateIfNecessary();
-
   internalLed->off();
-  delay(500);
 }
 
 void loop()

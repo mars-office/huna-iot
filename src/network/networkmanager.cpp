@@ -17,6 +17,10 @@ NetworkManager::NetworkManager(Config *config)
   this->sslClient2->setCACert(this->config->getCaCertificate());
   this->sslClient2->setPrivateKey(this->config->getClientKey());
   this->sslClient2->setCertificate(this->config->getClientCertificate());
+
+  String temp = "commands/";
+  temp.concat(this->config->getId());
+  this->commandsTopic = strdup(temp.c_str());
 }
 
 NetworkManager::~NetworkManager()
@@ -27,11 +31,12 @@ NetworkManager::~NetworkManager()
   delete this->tinyGsmClient;
   delete this->tinyGsmClient2;
   delete this->modem;
+  delete this->commandsTopic;
 }
 
 void NetworkManager::init()
 {
-  pinMode(GPIO_NUM_4, OUTPUT); // reset pin
+  pinMode(GPIO_NUM_4, OUTPUT);    // reset pin
   digitalWrite(GPIO_NUM_4, HIGH); // default high, set to low for 100ms for reset, method for that is below hardResetModem()
   Serial2.begin(115200);
   Serial.println("[NetworkManager] Initializing modem...");
@@ -100,6 +105,12 @@ void NetworkManager::ensureMqttIsConnected()
     {
       Serial.println("[NetworkManager] MQTT connected.");
       passes = 0;
+      Serial.print("[NetworkManager] Subscribing to topic: ");
+      Serial.println(this->commandsTopic);
+      if (!this->mqttSubscribe(this->commandsTopic, 1))
+      {
+        Serial.println("Could not subscribe to commands topic");
+      }
     }
 
     if (passes == 120)
@@ -227,6 +238,4 @@ void NetworkManager::hardResetModem()
   digitalWrite(GPIO_NUM_4, LOW);
   delay(100);
   digitalWrite(GPIO_NUM_4, HIGH);
-  delay(1000);
-  ESP.restart();
 }

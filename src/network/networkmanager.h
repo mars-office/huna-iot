@@ -41,6 +41,7 @@ private:
   Config* config;
   SSLClientESP32* sslClient;
   SSLClientESP32* sslClient2;
+  const char* commandsTopic;
 };
 
 #endif
