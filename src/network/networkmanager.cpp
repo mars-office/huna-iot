@@ -227,4 +227,6 @@ void NetworkManager::hardResetModem()
   digitalWrite(GPIO_NUM_4, LOW);
   delay(100);
   digitalWrite(GPIO_NUM_4, HIGH);
+  delay(1000);
+  ESP.restart();
 }
