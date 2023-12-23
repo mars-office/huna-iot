@@ -36,7 +36,7 @@ void handleCommand(String payload) {
   }
   if (payload == "forcedota") {
     Serial.println("[Command] Forced OTA Update...");
-    ota->updateIfNecessary(false);
+    ota->updateIfNecessary(true);
     return;
   }
   if (payload == "resetmodem") {
