@@ -89,8 +89,10 @@ void setup()
   statusMonitor = new StatusMonitor(netMan, config);
   ota = new OtaManager(fileMan, netMan);
   netMan->init();
+  delay(500);
   netMan->ensureRegistrationOnNetwork();
   netMan->ensureGprsIsConnected();
+  delay(500);
   const struct timeval tv = netMan->fetchGSMTime();
   gsmTime = new timeval(tv);
   settimeofday(gsmTime, NULL);
@@ -99,7 +101,9 @@ void setup()
   Serial.println("Sending initial status event...");
   netMan->publishMqttMessage(statusTopic, statusMonitor->getStatusJson());
   Serial.println("Initial status event sent.");
+  delay(500);
   ota->updateIfNecessary(false);
+  delay(500);
   internalLed->off();
 }
 
