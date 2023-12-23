@@ -31,7 +31,12 @@ void handleCommand(String payload) {
   }
   if (payload == "otacheck") {
     Serial.println("[Command] OTA Check...");
-    ota->updateIfNecessary();
+    ota->updateIfNecessary(false);
+    return;
+  }
+  if (payload == "forcedota") {
+    Serial.println("[Command] Forced OTA Update...");
+    ota->updateIfNecessary(false);
     return;
   }
   if (payload == "resetmodem") {
@@ -94,7 +99,7 @@ void setup()
   Serial.println("Sending initial status event...");
   netMan->publishMqttMessage(statusTopic, statusMonitor->getStatusJson());
   Serial.println("Initial status event sent.");
-  ota->updateIfNecessary();
+  ota->updateIfNecessary(false);
   internalLed->off();
 }
 
@@ -121,7 +126,7 @@ void loop()
   if (currentMillis - lastOtaCheckMillis >= 3600000L) {
     Serial.println("Checking for OTA updates...");
     lastOtaCheckMillis = currentMillis;
-    ota->updateIfNecessary();
+    ota->updateIfNecessary(false);
   }
 
   internalLed->off();

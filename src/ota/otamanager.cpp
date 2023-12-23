@@ -14,23 +14,28 @@ OtaManager::~OtaManager()
   delete this->fileMan;
 }
 
-void OtaManager::updateIfNecessary()
+void OtaManager::updateIfNecessary(bool forceUpdate)
 {
   Serial.println("[OtaManager] Checking for server update...");
   char *serverVersion = this->netMan->otaGetServerVersion();
   Serial.print("[OtaManager] Server version: ");
   Serial.println(serverVersion);
-  if (serverVersion == nullptr)
+
+  if (!forceUpdate)
   {
-    Serial.println("[OtaManager] Cannot get latest version from server");
-    return;
+    if (serverVersion == nullptr)
+    {
+      Serial.println("[OtaManager] Cannot get latest version from server");
+      return;
+    }
+    if (!strcmp(serverVersion, VERSION))
+    {
+      Serial.print("[OtaManager] No update needed, already running ");
+      Serial.println(VERSION);
+      return;
+    }
   }
-  if (!strcmp(serverVersion, VERSION))
-  {
-    Serial.print("[OtaManager] No update needed, already running ");
-    Serial.println(VERSION);
-    return;
-  }
+  
   Serial.print("[OtaManager] Downloading firmware.bin, v");
   Serial.println(serverVersion);
   this->fileMan->deleteFileIfExists("/ota/firmware.bin");

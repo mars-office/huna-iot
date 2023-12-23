@@ -7,7 +7,7 @@ class OtaManager {
 public:
     OtaManager(FileManager* fileMan, NetworkManager* netMan);
     ~OtaManager();
-    void updateIfNecessary();
+    void updateIfNecessary(bool forceUpdate);
 
 private:
     NetworkManager* netMan;
