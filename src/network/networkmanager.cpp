@@ -36,8 +36,8 @@ NetworkManager::~NetworkManager()
 
 void NetworkManager::init()
 {
-  pinMode(GPIO_NUM_4, OUTPUT);    // reset pin
-  digitalWrite(GPIO_NUM_4, HIGH); // default high, set to low for 100ms for reset, method for that is below hardResetModem()
+  pinMode(GPIO_NUM_4, OUTPUT);
+  digitalWrite(GPIO_NUM_4, HIGH);
   Serial2.begin(115200);
   Serial.println("[NetworkManager] Initializing modem...");
   this->modem->init();
