@@ -1,4 +1,4 @@
-FROM python:latest AS builder
+FROM --platform=linux/amd64 python:latest AS builder
 WORKDIR /app
 RUN pip install --upgrade platformio
 COPY ./platformio.ini ./platformio.ini
