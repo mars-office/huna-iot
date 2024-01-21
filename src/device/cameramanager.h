@@ -5,5 +5,6 @@ public:
     CameraManager();
     ~CameraManager();
     void init();
+    void takePhoto();
 };
 #endif

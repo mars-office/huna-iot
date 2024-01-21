@@ -21,6 +21,7 @@ CameraManager* cameraManager;
 
 unsigned long lastStatusMillis = 0;
 unsigned long lastOtaCheckMillis = 0;
+unsigned long lastPhotoMillis = 0;
 const char* statusTopic;
 
 
@@ -105,7 +106,7 @@ void setup()
 
   cameraManager = new CameraManager();
   cameraManager->init();
-  
+
   internalLed->off();
 }
 
@@ -133,6 +134,12 @@ void loop()
     Serial.println("Checking for OTA updates...");
     lastOtaCheckMillis = currentMillis;
     ota->updateIfNecessary(false);
+  }
+
+  if (currentMillis - lastPhotoMillis >= 30000L) {
+    Serial.println("Taking photo...");
+    lastPhotoMillis = currentMillis;
+    cameraManager->takePhoto();
   }
 
   internalLed->off();
