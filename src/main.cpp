@@ -8,6 +8,7 @@
 #include "version.h"
 #include "device/internalledmanager.h"
 #include "device/statusmonitor.h"
+#include "device/cameramanager.h"
 
 FileManager* fileMan;
 Config *config;
@@ -16,6 +17,7 @@ struct timeval *gsmTime;
 OtaManager* ota;
 StatusMonitor* statusMonitor;
 InternalLedManager* internalLed;
+CameraManager* cameraManager;
 
 unsigned long lastStatusMillis = 0;
 unsigned long lastOtaCheckMillis = 0;
@@ -100,6 +102,10 @@ void setup()
   netMan->publishMqttMessage(statusTopic, statusMonitor->getStatusJson());
   Serial.println("Initial status event sent.");
   ota->updateIfNecessary(false);
+
+  cameraManager = new CameraManager();
+  cameraManager->init();
+  
   internalLed->off();
 }
 
