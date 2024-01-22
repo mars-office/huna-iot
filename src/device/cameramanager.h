@@ -11,7 +11,6 @@ public:
     void takePhoto();
 private:
     OV7670* cam;
-    uint16_t *buf;
     uint16_t w;
     uint16_t h;
 };

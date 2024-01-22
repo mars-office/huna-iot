@@ -1,5 +1,5 @@
-#define MODE QVGA // 320 X 240
-// #define MODE      QQVGA  // 160 x 120
+// #define MODE QVGA // 320 X 240
+#define MODE      QQVGA  // 160 x 120
 // #define MODE      QCIF  // 176 x 144 (crop)
 // #define MODE      QQCIF  //  88 x 72 (crop)
 
@@ -41,7 +41,6 @@ CameraManager::CameraManager()
 CameraManager::~CameraManager()
 {
   delete this->cam;
-  delete[] this->buf;
 }
 
 void CameraManager::init()
@@ -84,10 +83,5 @@ void CameraManager::init()
 
 void CameraManager::takePhoto()
 {
-  for (uint16_t y = 0; y < this->h; y++) {
-    this->buf = this->cam->getLine(y + 1);
-    Serial.print("[CameraManager] Photo line size:");
-    Serial.println(sizeof(this->buf));
-    //tft.drawRGBBitmap(0, y, buf, w, 1);
-  }
+  
 }
