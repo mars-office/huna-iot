@@ -74,7 +74,7 @@ void setup()
   internalLed->on();
   fileMan = new FileManager();
   config = new Config(fileMan);
-  Serial.begin(9600);
+  Serial.begin(115200);
   delay(10);
   Serial.print("Version:");
   Serial.println(VERSION);
