@@ -74,7 +74,7 @@ void setup()
   internalLed->on();
   fileMan = new FileManager();
   config = new Config(fileMan);
-  Serial.begin(115200);
+  Serial.begin(9600);
   delay(10);
   Serial.print("Version:");
   Serial.println(VERSION);
@@ -108,6 +108,7 @@ void setup()
   cameraManager->init();
 
   internalLed->off();
+  Serial.println("Setup done");
 }
 
 void loop()
