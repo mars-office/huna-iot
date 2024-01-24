@@ -1,4 +1,4 @@
-#include <arduino.h>
+#include <Arduino.h>
 #include <Wire.h>
 #include <OV7670.h>
 #include <pgmspace.h>
