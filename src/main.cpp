@@ -140,8 +140,8 @@ void loop()
   if (lastPhotoMillis == 0 || currentMillis - lastPhotoMillis >= 30000L) {
     Serial.println("Taking photo...");
     lastPhotoMillis = currentMillis;
+    Serial.println("BEGIN");
     cameraManager->takePhoto([](uint16_t w, uint16_t h, uint16_t i, uint16_t* line) {
-      Serial.println("BEGIN");
       Serial.print(i);
       for (int j = 0; j < w; j++) {
         Serial.print(line[j]);
