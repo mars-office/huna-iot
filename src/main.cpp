@@ -137,10 +137,19 @@ void loop()
     ota->updateIfNecessary(false);
   }
 
-  if (currentMillis - lastPhotoMillis >= 30000L) {
+  if (lastPhotoMillis == 0 || currentMillis - lastPhotoMillis >= 30000L) {
     Serial.println("Taking photo...");
     lastPhotoMillis = currentMillis;
-    cameraManager->takePhoto();
+    cameraManager->takePhoto([](uint16_t w, uint16_t h, uint16_t i, uint16_t* line) {
+      Serial.println("BEGIN");
+      Serial.print(i);
+      for (int j = 0; j < w; j++) {
+        Serial.print(line[j]);
+        Serial.print(" ");
+      }
+      Serial.println();
+    });
+    Serial.println("END");
   }
 
   internalLed->off();

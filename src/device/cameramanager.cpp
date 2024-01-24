@@ -1,7 +1,7 @@
-// #define MODE QVGA // 320 X 240
-#define MODE      QQVGA  // 160 x 120
+#define MODE QVGA // 320 X 240
+// #define MODE      QQVGA  // 160 x 120
 // #define MODE      QCIF  // 176 x 144 (crop)
-// #define MODE      QQCIF  //  88 x 72 (crop)
+//#define MODE      QQCIF  //  88 x 72 (crop)
 
 #define COLOR RGB565
 // #define COLOR     YUV422
@@ -81,7 +81,9 @@ void CameraManager::init()
   Serial.println("[CameraManager] Camera initialized");
 }
 
-void CameraManager::takePhoto()
+void CameraManager::takePhoto(std::function<void(uint16_t, uint16_t, uint16_t, uint16_t*)> callback)
 {
-  
+  for (uint16_t y = 0; y < this->h; y++) {
+    callback(this->w, this->h, y, this->cam->getLine(y + 1));
+  }
 }

@@ -8,7 +8,7 @@ public:
     CameraManager();
     ~CameraManager();
     void init();
-    void takePhoto();
+    void takePhoto(std::function<void(uint16_t, uint16_t, uint16_t, uint16_t*)> callback);
 private:
     OV7670* cam;
     uint16_t w;
