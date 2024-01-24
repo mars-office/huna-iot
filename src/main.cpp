@@ -142,10 +142,8 @@ void loop()
     lastPhotoMillis = currentMillis;
     Serial.println("BEGIN");
     cameraManager->takePhoto([](uint16_t w, uint16_t h, uint16_t i, uint16_t* line) {
-      Serial.print(i);
       for (int j = 0; j < w; j++) {
-        Serial.print(line[j]);
-        Serial.print(" ");
+        Serial.printf("0x%" PRIx16 " ", line[j]);
       }
       Serial.println();
     });
