@@ -143,9 +143,9 @@ void loop()
     Serial.println("BEGIN");
     cameraManager->takePhoto([](uint16_t w, uint16_t h, uint16_t i, uint16_t* line) {
       for (int j = 0; j < w; j++) {
-        Serial.printf("0x%" PRIx16 " ", line[j]);
+        // Serial.printf("0x%" PRIx16 " ", line[j]);
       }
-      Serial.println();
+      // Serial.println();
     });
     Serial.println("END");
   }
