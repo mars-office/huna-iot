@@ -108,7 +108,7 @@ void NetworkManager::ensureMqttIsConnected()
       Serial.print("[NetworkManager] Subscribing to topic: ");
       Serial.println(this->commandsTopic);
       delay(500);
-      if (!this->mqttSubscribe(this->commandsTopic, 1))
+      if (!this->mqttSubscribe(this->commandsTopic, 0))
       {
         Serial.println("Could not subscribe to commands topic");
       }
